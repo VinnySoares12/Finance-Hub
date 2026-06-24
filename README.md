@@ -1,86 +1,40 @@
 # Finance Hub
 
-Finance Hub é um projeto pessoal em **React + TypeScript** para controlar salário, reserva automática, gastos mensais e sobra disponível. A ideia é ser uma alternativa moderna a uma planilha de gastos pessoais, com interface tecnológica, responsiva e interativa.
+Finance Hub é uma aplicação web para organizar finanças pessoais de forma simples, visual e prática.
 
-## O que já vem pronto
+A ideia do projeto é facilitar o controle mensal de salário, reserva automática, gastos e saldo disponível, substituindo o uso de planilhas por uma interface mais moderna, responsiva e interativa.
 
-- Campo para informar o salário atual.
-- Controle de porcentagem que será guardada automaticamente.
-- Cálculo automático do valor guardado.
-- Cálculo automático das saídas/gastos.
-- Cálculo automático da sobra mensal.
-- Cadastro de gastos com nome, valor e categoria.
-- Categorias com emojis: mercado, transporte, água, luz, internet, casa, lazer, saúde, educação e outros.
-- Lista de gastos com botão de remover.
-- Distribuição dos gastos por categoria.
-- Dados salvos no navegador com `localStorage`.
-- Interface responsiva para desktop e celular.
-- Card 3D interativo com efeito de inclinação pelo mouse.
-- Estrutura limpa para evoluir com Codex, Claude Code ou VS Code.
+---
 
-## Como rodar no VS Code
+## Objetivo do projeto
 
-> Requisito recomendado: Node.js 20.19+.
+O objetivo do Finance Hub é ajudar no acompanhamento da vida financeira pessoal de maneira rápida e clara.
 
-```bash
-npm install
-npm run dev
-```
+Com ele, é possível informar o salário mensal, definir uma porcentagem para guardar automaticamente, registrar despesas e visualizar quanto ainda sobra no mês.
 
-Depois abra o endereço exibido no terminal, normalmente:
+O projeto foi pensado para ser simples no uso, mas com uma interface mais agradável e tecnológica, servindo tanto como ferramenta pessoal quanto como projeto de portfólio.
 
-```bash
-http://localhost:5173
-```
+---
 
-## Scripts disponíveis
+## Principais funcionalidades
 
-```bash
-npm run dev       # inicia o ambiente local
-npm run build     # valida TypeScript e gera build de produção
-npm run preview   # pré-visualiza o build
-npm run typecheck # roda apenas a checagem TypeScript
-```
+* Controle de salário mensal.
+* Definição automática de reserva financeira.
+* Cálculo do valor guardado.
+* Registro de despesas mensais.
+* Cálculo automático dos gastos.
+* Visualização da sobra disponível.
+* Organização dos gastos por categoria.
+* Dados salvos no navegador com `localStorage`.
+* Interface responsiva para desktop e celular.
+* Card interativo com efeito 3D baseado no movimento do mouse.
 
-## Estrutura principal
+---
 
-```txt
-finance-hub/
-├─ src/
-│  ├─ components/
-│  │  ├─ CategoryBreakdown.tsx
-│  │  ├─ ExpenseForm.tsx
-│  │  ├─ ExpenseList.tsx
-│  │  ├─ FinanceHero.tsx
-│  │  └─ MetricCard.tsx
-│  ├─ data/
-│  │  └─ categories.ts
-│  ├─ hooks/
-│  │  └─ useLocalStorage.ts
-│  ├─ utils/
-│  │  └─ formatters.ts
-│  ├─ App.tsx
-│  ├─ main.tsx
-│  ├─ styles.css
-│  └─ types.ts
-├─ docs/
-│  └─ CODEX_PROMPT.md
-├─ package.json
-└─ vite.config.ts
-```
+## Tecnologias utilizadas
 
-## Ideias para próximas versões
-
-- Login de usuário.
-- Metas financeiras por mês.
-- Gráfico mensal de evolução.
-- Exportar dados para CSV/Excel.
-- Modo claro/escuro.
-- Backend com banco de dados.
-- Gastos fixos e variáveis.
-- Controle por cartões, contas e bancos.
-- Dashboard anual.
-
-## Observação
-
-Este projeto é privado/pessoal e não contém nenhuma regra ligada a trabalho ou empresa. Ele foi pensado para portfólio, GitHub, LinkedIn e uso real com amigos.
+* React
+* TypeScript
+* Vite
+* CSS
+* LocalStorage
