@@ -9,6 +9,7 @@ import { MonthMenu } from './components/MonthMenu';
 import { LanguageSelector } from './components/LanguageSelector';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useI18n } from './i18n';
+import { exportExpensesToExcel } from './utils/formatters';
 import type { CategoryKey, Expense, FinanceState } from './types';
 
 const now = new Date();
@@ -212,6 +213,25 @@ function App() {
     setSelectedMonth(`${year}-${month}`);
   };
 
+  const handleExportExpenses = () => {
+    exportExpensesToExcel({
+      expenses: selectedMonthExpenses,
+      monthLabel: selectedMonthLabel,
+      monthKey: selectedMonth,
+      locale,
+      labels: {
+        reportTitle: t('expenseReport'),
+        date: t('exportDate'),
+        description: t('expenseName'),
+        category: t('category'),
+        amount: t('value'),
+        total: t('exportTotal'),
+        empty: t('noExpenses')
+      },
+      getCategoryLabel: (category) => t(`category.${category}`)
+    });
+  };
+
   return (
     <>
       <MonthMenu
@@ -220,10 +240,12 @@ function App() {
         years={availableYears}
         selectedMonth={selectedMonth}
         monthlySavings={monthlySavings}
+        expenseCount={selectedMonthExpenses.length}
         onToggle={() => setIsMonthMenuOpen((current) => !current)}
         onClose={() => setIsMonthMenuOpen(false)}
         onSelectMonth={setSelectedMonth}
         onSelectYear={handleSelectYear}
+        onExportExpenses={handleExportExpenses}
       />
 
       <main className="app-shell">

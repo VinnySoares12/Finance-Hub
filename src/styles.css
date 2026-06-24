@@ -237,6 +237,22 @@ button {
   font-size: 0.9rem;
 }
 
+.month-menu__list > button.month-menu__export {
+  margin-top: 8px;
+  border-color: rgba(52, 211, 153, 0.28);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.14), rgba(139, 92, 246, 0.1));
+}
+
+.month-menu__list > button.month-menu__export:hover {
+  border-color: rgba(52, 211, 153, 0.55);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.22), rgba(139, 92, 246, 0.15));
+}
+
+.month-menu__list > button.month-menu__export b {
+  color: #6ee7b7;
+  letter-spacing: 0.04em;
+}
+
 .app-shell {
   position: relative;
   z-index: 1;

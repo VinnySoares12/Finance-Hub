@@ -11,10 +11,12 @@ type MonthMenuProps = {
   years: number[];
   selectedMonth: string;
   monthlySavings: Record<string, number>;
+  expenseCount: number;
   onToggle: () => void;
   onClose: () => void;
   onSelectMonth: (month: string) => void;
   onSelectYear: (year: number) => void;
+  onExportExpenses: () => void;
 };
 
 export function MonthMenu({
@@ -23,10 +25,12 @@ export function MonthMenu({
   years,
   selectedMonth,
   monthlySavings,
+  expenseCount,
   onToggle,
   onClose,
   onSelectMonth,
-  onSelectYear
+  onSelectYear,
+  onExportExpenses
 }: MonthMenuProps) {
   const { t, currency } = useI18n();
   return (
@@ -94,6 +98,18 @@ export function MonthMenu({
               </button>
             );
           })}
+
+          <button
+            className="month-menu__export"
+            type="button"
+            onClick={onExportExpenses}
+          >
+            <span>
+              <strong>{t('exportExpenses')}</strong>
+              <small>{t('exportExpensesHint', { count: expenseCount })}</small>
+            </span>
+            <b aria-hidden="true">↓ XLS</b>
+          </button>
         </div>
       </aside>
     </>

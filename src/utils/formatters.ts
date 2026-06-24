@@ -1,3 +1,5 @@
+import type { CategoryKey, Expense } from '../types';
+
 export const currencyFormatter = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
   currency: 'BRL',
@@ -54,4 +56,88 @@ export const parseMoney = (value: string) => {
 
   const parsed = Number(normalized);
   return Number.isFinite(parsed) ? parsed : 0;
+};
+
+type ExcelExportOptions = {
+  expenses: Expense[];
+  monthLabel: string;
+  monthKey: string;
+  locale: string;
+  labels: {
+    reportTitle: string;
+    date: string;
+    description: string;
+    category: string;
+    amount: string;
+    total: string;
+    empty: string;
+  };
+  getCategoryLabel: (category: CategoryKey) => string;
+};
+
+const escapeXml = (value: string) => value
+  .replace(/&/g, '&amp;')
+  .replace(/</g, '&lt;')
+  .replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;')
+  .replace(/'/g, '&apos;');
+
+const excelStringCell = (value: string, styleId?: string) =>
+  `<Cell${styleId ? ` ss:StyleID="${styleId}"` : ''}><Data ss:Type="String">${escapeXml(value)}</Data></Cell>`;
+
+const excelNumberCell = (value: number, styleId?: string) =>
+  `<Cell${styleId ? ` ss:StyleID="${styleId}"` : ''}><Data ss:Type="Number">${value}</Data></Cell>`;
+
+export const exportExpensesToExcel = ({
+  expenses,
+  monthLabel,
+  monthKey,
+  locale,
+  labels,
+  getCategoryLabel
+}: ExcelExportOptions) => {
+  const total = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+  const rows = expenses.length > 0
+    ? expenses.map((expense) => {
+        const date = new Date(expense.createdAt).toLocaleDateString(locale);
+
+        return `<Row>${excelStringCell(date)}${excelStringCell(expense.title)}${excelStringCell(getCategoryLabel(expense.category))}${excelNumberCell(expense.amount, 'Currency')}</Row>`;
+      }).join('')
+    : `<Row>${excelStringCell(labels.empty)}</Row>`;
+
+  const worksheetName = monthLabel.slice(0, 31) || monthKey;
+  const spreadsheet = `<?xml version="1.0"?>
+<?mso-application progid="Excel.Sheet"?>
+<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
+ xmlns:o="urn:schemas-microsoft-com:office:office"
+ xmlns:x="urn:schemas-microsoft-com:office:excel"
+ xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
+ <Styles>
+  <Style ss:ID="Header"><Font ss:Bold="1"/><Interior ss:Color="#DDD6FE" ss:Pattern="Solid"/></Style>
+  <Style ss:ID="Title"><Font ss:Bold="1" ss:Size="14"/></Style>
+  <Style ss:ID="Currency"><NumberFormat ss:Format="&quot;R$&quot; #,##0.00"/></Style>
+ </Styles>
+ <Worksheet ss:Name="${escapeXml(worksheetName)}">
+  <Table>
+   <Column ss:Width="90"/><Column ss:Width="220"/><Column ss:Width="140"/><Column ss:Width="100"/>
+   <Row>${excelStringCell(`${labels.reportTitle} — ${monthLabel}`, 'Title')}</Row>
+   <Row/>
+   <Row>${excelStringCell(labels.date, 'Header')}${excelStringCell(labels.description, 'Header')}${excelStringCell(labels.category, 'Header')}${excelStringCell(labels.amount, 'Header')}</Row>
+   ${rows}
+   <Row/>
+   <Row>${excelStringCell(labels.total, 'Header')}<Cell/><Cell/>${excelNumberCell(total, 'Currency')}</Row>
+  </Table>
+ </Worksheet>
+</Workbook>`;
+
+  const blob = new Blob([spreadsheet], { type: 'application/vnd.ms-excel;charset=utf-8' });
+  const url = URL.createObjectURL(blob);
+  const link = document.createElement('a');
+
+  link.href = url;
+  link.download = `despesas-${monthKey}.xls`;
+  document.body.appendChild(link);
+  link.click();
+  link.remove();
+  URL.revokeObjectURL(url);
 };
