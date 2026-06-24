@@ -8,21 +8,25 @@ type MonthOption = {
 type MonthMenuProps = {
   isOpen: boolean;
   months: MonthOption[];
+  years: number[];
   selectedMonth: string;
   monthlySavings: Record<string, number>;
   onToggle: () => void;
   onClose: () => void;
   onSelectMonth: (month: string) => void;
+  onSelectYear: (year: number) => void;
 };
 
 export function MonthMenu({
   isOpen,
   months,
+  years,
   selectedMonth,
   monthlySavings,
   onToggle,
   onClose,
-  onSelectMonth
+  onSelectMonth,
+  onSelectYear
 }: MonthMenuProps) {
   const { t, currency } = useI18n();
   return (
@@ -53,8 +57,19 @@ export function MonthMenu({
             <span>{t('history')}</span>
             <strong>{t('historyTitle')}</strong>
           </div>
-          <button type="button" onClick={onClose} aria-label={t('closeMenu')}>×</button>
         </div>
+
+        <label className="month-menu__year">
+          <span>{t('selectYear')}</span>
+          <select
+            value={Number(selectedMonth.slice(0, 4))}
+            onChange={(event) => onSelectYear(Number(event.target.value))}
+          >
+            {years.map((year) => (
+              <option key={year} value={year}>{year}</option>
+            ))}
+          </select>
+        </label>
 
         <div className="month-menu__list">
           {months.map((month) => {

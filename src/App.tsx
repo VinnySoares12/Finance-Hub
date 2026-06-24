@@ -13,9 +13,10 @@ import type { CategoryKey, Expense, FinanceState } from './types';
 
 const now = new Date();
 const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+const availableYears = Array.from({ length: 14 }, (_, index) => now.getFullYear() - 3 + index);
 
 const initialFinanceState: FinanceState = {
-  salary: 5000,
+  salary: 0,
   savingsPercent: 20,
   goalName: '',
   goalAmount: 0,
@@ -69,17 +70,22 @@ function App() {
   const [finance, setFinance] = useLocalStorage<FinanceState>('finance-hub-state', initialFinanceState);
   const [selectedMonth, setSelectedMonth] = useState(currentMonthKey);
   const [isMonthMenuOpen, setIsMonthMenuOpen] = useState(false);
+  const [goalDraftName, setGoalDraftName] = useState(finance.goalName ?? '');
+  const [goalDraftAmount, setGoalDraftAmount] = useState(finance.goalAmount ?? 0);
+  const [goalError, setGoalError] = useState('');
 
   useEffect(() => {
     setFinance((current) => {
       const hasLegacyExampleGoal =
         current.goalName === 'Minha liberdade financeira' && current.goalAmount === 12000;
       const needsMonthlySavings = !current.monthlySavings;
+      const hasLegacyExampleSalary = current.salary === 5000;
 
-      if (!hasLegacyExampleGoal && !needsMonthlySavings) return current;
+      if (!hasLegacyExampleGoal && !needsMonthlySavings && !hasLegacyExampleSalary) return current;
 
       return {
         ...current,
+        salary: hasLegacyExampleSalary ? 0 : current.salary,
         goalName: hasLegacyExampleGoal ? '' : current.goalName,
         goalAmount: hasLegacyExampleGoal ? 0 : current.goalAmount,
         monthlySavings: current.monthlySavings ?? {}
@@ -100,9 +106,14 @@ function App() {
     [monthlySavings]
   );
 
+  const selectedMonthExpenses = useMemo(
+    () => finance.expenses.filter((expense) => expense.createdAt.slice(0, 7) === selectedMonth),
+    [finance.expenses, selectedMonth]
+  );
+
   const totalExpenses = useMemo(
-    () => finance.expenses.reduce((sum, expense) => sum + expense.amount, 0),
-    [finance.expenses]
+    () => selectedMonthExpenses.reduce((sum, expense) => sum + expense.amount, 0),
+    [selectedMonthExpenses]
   );
 
   const plannedSavings = useMemo(
@@ -134,12 +145,31 @@ function App() {
     }));
   };
 
-  const handleGoalNameChange = (value: string) => {
-    setFinance((current) => ({ ...current, goalName: value }));
+  const handleSaveGoal = () => {
+    const name = goalDraftName.trim();
+
+    if (!name || goalDraftAmount <= 0) {
+      setGoalError(t('goalError'));
+      return;
+    }
+
+    setFinance((current) => ({
+      ...current,
+      goalName: name,
+      goalAmount: goalDraftAmount
+    }));
+    setGoalError('');
   };
 
-  const handleGoalAmountChange = (value: number) => {
-    setFinance((current) => ({ ...current, goalAmount: value }));
+  const handleDeleteGoal = () => {
+    setFinance((current) => ({
+      ...current,
+      goalName: '',
+      goalAmount: 0
+    }));
+    setGoalDraftName('');
+    setGoalDraftAmount(0);
+    setGoalError('');
   };
 
   const handleAddExpense = (title: string, amount: number, category: CategoryKey) => {
@@ -148,7 +178,7 @@ function App() {
       title,
       amount,
       category,
-      createdAt: new Date().toISOString()
+      createdAt: `${selectedMonth}-01T12:00:00.000Z`
     };
 
     setFinance((current) => ({
@@ -165,8 +195,21 @@ function App() {
   };
 
   const handleReset = () => {
-    setFinance({ ...initialFinanceState, expenses: [] });
-    setSelectedMonth(currentMonthKey);
+    setFinance((current) => {
+      const nextMonthlySavings = { ...(current.monthlySavings ?? {}) };
+      delete nextMonthlySavings[selectedMonth];
+
+      return {
+        ...current,
+        monthlySavings: nextMonthlySavings,
+        expenses: current.expenses.filter((expense) => expense.createdAt.slice(0, 7) !== selectedMonth)
+      };
+    });
+  };
+
+  const handleSelectYear = (year: number) => {
+    const month = selectedMonth.slice(5, 7);
+    setSelectedMonth(`${year}-${month}`);
   };
 
   return (
@@ -174,11 +217,13 @@ function App() {
       <MonthMenu
         isOpen={isMonthMenuOpen}
         months={months}
+        years={availableYears}
         selectedMonth={selectedMonth}
         monthlySavings={monthlySavings}
         onToggle={() => setIsMonthMenuOpen((current) => !current)}
         onClose={() => setIsMonthMenuOpen(false)}
         onSelectMonth={setSelectedMonth}
+        onSelectYear={handleSelectYear}
       />
 
       <main className="app-shell">
@@ -243,25 +288,41 @@ function App() {
               </label>
             </div>
 
-            <div className="goal-fields">
-              <label>
-                {t('personalGoal')}
-                <input
-                  value={finance.goalName ?? ''}
-                  onChange={(event) => handleGoalNameChange(event.target.value)}
-                  placeholder={t('goalPlaceholder')}
-                  maxLength={42}
-                />
-              </label>
+            <div className="goal-editor">
+              <div className="goal-fields">
+                <label>
+                  {t('personalGoal')}
+                  <input
+                    value={goalDraftName}
+                    onChange={(event) => setGoalDraftName(event.target.value)}
+                    placeholder={t('goalPlaceholder')}
+                    maxLength={42}
+                  />
+                </label>
 
-              <label>
-                {t('goalValue')}
-                <MoneyInput
-                  value={finance.goalAmount ?? 0}
-                  onValueChange={handleGoalAmountChange}
-                  placeholder="Ex: 20000"
-                />
-              </label>
+                <label>
+                  {t('goalValue')}
+                  <MoneyInput
+                    value={goalDraftAmount}
+                    onValueChange={setGoalDraftAmount}
+                    placeholder="Ex: 20000"
+                  />
+                </label>
+              </div>
+
+              {goalError ? <p className="form-error goal-error">{goalError}</p> : null}
+
+              <div className="goal-actions">
+                <button className="goal-button" type="button" onClick={handleSaveGoal}>
+                  {finance.goalName && finance.goalAmount > 0 ? t('updateGoal') : t('addGoal')}
+                </button>
+
+                {finance.goalName || finance.goalAmount > 0 ? (
+                  <button className="goal-delete-button" type="button" onClick={handleDeleteGoal}>
+                    {t('deleteGoal')}
+                  </button>
+                ) : null}
+              </div>
             </div>
 
             <button className="ghost-button" type="button" onClick={handleReset}>
@@ -286,8 +347,8 @@ function App() {
         </section>
 
         <section className="content-grid">
-          <ExpenseList expenses={finance.expenses} onRemoveExpense={handleRemoveExpense} />
-          <CategoryBreakdown expenses={finance.expenses} totalExpenses={totalExpenses} />
+          <ExpenseList expenses={selectedMonthExpenses} onRemoveExpense={handleRemoveExpense} />
+          <CategoryBreakdown expenses={selectedMonthExpenses} totalExpenses={totalExpenses} />
         </section>
 
         <footer className="site-footer">

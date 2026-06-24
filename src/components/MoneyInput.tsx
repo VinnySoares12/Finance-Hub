@@ -1,4 +1,5 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import { useI18n } from '../i18n';
 import { parseMoney } from '../utils/formatters';
 
 type MoneyInputProps = {
@@ -7,18 +8,29 @@ type MoneyInputProps = {
   placeholder?: string;
 };
 
-const valueToInput = (value: number) => (
-  value ? String(value).replace('.', ',') : ''
-);
+const valueToInput = (value: number, locale: string) => {
+  if (!value) return '';
+
+  return new Intl.NumberFormat(locale, {
+    useGrouping: false,
+    maximumFractionDigits: 2
+  }).format(value);
+};
 
 export function MoneyInput({ value, onValueChange, placeholder }: MoneyInputProps) {
-  const [inputValue, setInputValue] = useState(() => valueToInput(value));
+  const { locale } = useI18n();
+  const previousLocale = useRef(locale);
+  const [inputValue, setInputValue] = useState(() => valueToInput(value, locale));
 
   useEffect(() => {
-    if (Math.abs(parseMoney(inputValue) - value) > 0.000001) {
-      setInputValue(valueToInput(value));
+    const localeChanged = previousLocale.current !== locale;
+
+    if (localeChanged || Math.abs(parseMoney(inputValue) - value) > 0.000001) {
+      setInputValue(valueToInput(value, locale));
     }
-  }, [value]);
+
+    previousLocale.current = locale;
+  }, [value, locale, inputValue]);
 
   const handleChange = (nextValue: string) => {
     setInputValue(nextValue);

@@ -163,20 +163,34 @@ button {
   font-size: 1.25rem;
 }
 
-.month-menu__header > button {
-  width: 36px;
-  height: 36px;
+.month-menu__year {
+  display: grid;
+  grid-template-columns: 1fr 120px;
+  gap: 12px;
+  align-items: center;
+  margin: 0 0 16px;
+  padding: 10px 12px;
   border: 1px solid var(--border);
-  border-radius: 12px;
-  background: rgba(255, 255, 255, 0.05);
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.month-menu__year span {
   color: var(--text-soft);
-  font-size: 1.35rem;
+  font-size: 0.86rem;
+}
+
+.month-menu__year select {
+  min-height: 40px;
+  border-radius: 12px;
+  text-align: center;
+  font-weight: 800;
 }
 
 .month-menu__list {
   display: grid;
   gap: 8px;
-  max-height: calc(100vh - 175px);
+  max-height: calc(100vh - 250px);
   overflow-y: auto;
   padding-right: 4px;
 }
@@ -593,6 +607,62 @@ select option {
   display: grid;
   grid-template-columns: 1.25fr 0.75fr;
   gap: 12px;
+}
+
+.goal-editor {
+  margin-bottom: 16px;
+  padding: 14px;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  background: rgba(18, 12, 29, 0.3);
+}
+
+.goal-editor .goal-fields label {
+  margin-bottom: 12px;
+}
+
+.goal-button {
+  width: 100%;
+  min-height: 46px;
+  border: 0;
+  border-radius: 14px;
+  background: linear-gradient(135deg, var(--primary-light), var(--primary));
+  color: #160d28;
+  box-shadow: 0 12px 28px var(--primary-glow);
+  font-weight: 900;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.goal-actions {
+  display: grid;
+  grid-template-columns: 1fr auto;
+  gap: 10px;
+}
+
+.goal-delete-button {
+  min-width: 112px;
+  min-height: 46px;
+  padding: 0 16px;
+  border: 1px solid rgba(240, 140, 135, 0.3);
+  border-radius: 14px;
+  background: rgba(240, 140, 135, 0.08);
+  color: var(--danger);
+  font-weight: 800;
+  transition: transform 0.2s ease, background 0.2s ease;
+}
+
+.goal-delete-button:hover {
+  background: rgba(240, 140, 135, 0.14);
+  transform: translateY(-2px);
+}
+
+.goal-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 32px var(--primary-glow);
+}
+
+.goal-error {
+  margin: 0 0 12px;
 }
 
 .goal-vault {
@@ -1173,6 +1243,10 @@ select option {
   }
 
   .goal-fields {
+    grid-template-columns: 1fr;
+  }
+
+  .goal-actions {
     grid-template-columns: 1fr;
   }
 
