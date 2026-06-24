@@ -1043,6 +1043,23 @@ select option {
   color: var(--text-muted);
 }
 
+.site-footer {
+  display: flex;
+  justify-content: space-between;
+  gap: 18px;
+  align-items: center;
+  margin-top: 28px;
+  padding: 22px 4px 0;
+  border-top: 1px solid var(--border);
+  color: var(--text-muted);
+  font-size: 0.82rem;
+}
+
+.site-footer strong {
+  color: var(--primary-light);
+  font-weight: 700;
+}
+
 @keyframes rise-in {
   from {
     opacity: 0;
@@ -1187,5 +1204,11 @@ select option {
 
   .breakdown-row {
     grid-template-columns: 1fr;
+  }
+
+  .site-footer {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 7px;
   }
 }

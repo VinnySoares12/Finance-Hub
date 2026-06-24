@@ -289,6 +289,11 @@ function App() {
           <ExpenseList expenses={finance.expenses} onRemoveExpense={handleRemoveExpense} />
           <CategoryBreakdown expenses={finance.expenses} totalExpenses={totalExpenses} />
         </section>
+
+        <footer className="site-footer">
+          <span>© {new Date().getFullYear()} Finance Hub. {t('rights')}</span>
+          <strong>{t('madeBy')}</strong>
+        </footer>
       </main>
     </>
   );
