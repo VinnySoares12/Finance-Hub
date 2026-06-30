@@ -80,7 +80,8 @@ const escapeXml = (value: string) => value
   .replace(/</g, '&lt;')
   .replace(/>/g, '&gt;')
   .replace(/"/g, '&quot;')
-  .replace(/'/g, '&apos;');
+  .replace(/'/g, '&apos;')
+  .replace(/[\r\n]+/g, ' ');
 
 const excelStringCell = (value: string, styleId?: string) =>
   `<Cell${styleId ? ` ss:StyleID="${styleId}"` : ''}><Data ss:Type="String">${escapeXml(value)}</Data></Cell>`;
@@ -96,12 +97,13 @@ export const exportExpensesToExcel = ({
   labels,
   getCategoryLabel
 }: ExcelExportOptions) => {
-  const total = expenses.reduce((sum, expense) => sum + expense.amount, 0);
+  const total = expenses.reduce((sum, expense) => sum + (Number.isFinite(expense.amount) ? expense.amount : 0), 0);
   const rows = expenses.length > 0
     ? expenses.map((expense) => {
         const date = new Date(expense.createdAt).toLocaleDateString(locale);
+        const amount = Number.isFinite(expense.amount) ? expense.amount : 0;
 
-        return `<Row>${excelStringCell(date)}${excelStringCell(expense.title)}${excelStringCell(getCategoryLabel(expense.category))}${excelNumberCell(expense.amount, 'Currency')}</Row>`;
+        return `<Row>${excelStringCell(date)}${excelStringCell(expense.title)}${excelStringCell(getCategoryLabel(expense.category))}${excelNumberCell(amount, 'Currency')}</Row>`;
       }).join('')
     : `<Row>${excelStringCell(labels.empty)}</Row>`;
 

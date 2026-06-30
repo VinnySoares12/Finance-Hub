@@ -102,6 +102,7 @@ export function MonthMenu({
           <button
             className="month-menu__export"
             type="button"
+            disabled={expenseCount === 0}
             onClick={onExportExpenses}
           >
             <span>

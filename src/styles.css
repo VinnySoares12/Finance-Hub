@@ -253,6 +253,16 @@ button {
   letter-spacing: 0.04em;
 }
 
+.month-menu__list > button.month-menu__export:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.month-menu__list > button.month-menu__export:disabled:hover {
+  border-color: rgba(52, 211, 153, 0.28);
+  background: linear-gradient(135deg, rgba(16, 185, 129, 0.14), rgba(139, 92, 246, 0.1));
+}
+
 .app-shell {
   position: relative;
   z-index: 1;
