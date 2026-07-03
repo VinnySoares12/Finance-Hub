@@ -37,4 +37,3 @@ O projeto foi pensado para ser simples no uso, mas com uma interface mais agrad√
 * TypeScript
 * Vite
 * CSS
-* LocalStorage
