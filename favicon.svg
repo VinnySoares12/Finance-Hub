@@ -1,0 +1,10 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200">
+  <defs>
+    <style>
+      .bg { fill: #6B21A8; }
+      .text { fill: #FFFFFF; font-family: Arial, sans-serif; font-size: 120px; font-weight: bold; }
+    </style>
+  </defs>
+  <rect class="bg" width="200" height="200" rx="40"/>
+  <text class="text" x="50%" y="50%" dominant-baseline="middle" text-anchor="middle">FH</text>
+</svg>
