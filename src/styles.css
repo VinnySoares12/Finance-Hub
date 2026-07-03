@@ -272,12 +272,11 @@ button {
 }
 
 .language-selector {
-  position: fixed;
-  top: 24px;
-  right: 24px;
-  z-index: 60;
   display: flex;
+  justify-content: flex-end;
   gap: 5px;
+  width: fit-content;
+  margin: 0 0 16px auto;
   padding: 5px;
   border: 1px solid var(--border);
   border-radius: 16px;
@@ -1223,8 +1222,7 @@ select option {
   }
 
   .language-selector {
-    top: 14px;
-    right: 14px;
+    margin-bottom: 12px;
   }
 
   .language-selector button {
@@ -1233,7 +1231,6 @@ select option {
 
   .selected-month-chip {
     justify-content: flex-start;
-    padding-left: 60px;
   }
 
   .hero-copy h1 {
