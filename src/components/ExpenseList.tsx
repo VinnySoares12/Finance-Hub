@@ -32,12 +32,18 @@ export function ExpenseList({ expenses, onRemoveExpense }: ExpenseListProps) {
       <div className="expense-list__items">
         {expenses.map((expense) => {
           const category = getCategory(expense.category);
+          const isInstallment = expense.installments && expense.installments > 1;
+          const installmentNumber = isInstallment ? (expenses.filter((e) => e.installmentGroupId === expense.installmentGroupId &&
+                                                                              new Date(e.createdAt) <= new Date(expense.createdAt)).length) : undefined;
 
           return (
             <article className="expense-item" key={expense.id}>
               <div className={`expense-item__emoji ${category.gradient}`}>{category.emoji}</div>
               <div className="expense-item__content">
-                <strong>{expense.title}</strong>
+                <strong>
+                  {expense.title}
+                  {isInstallment && <span style={{ marginLeft: '8px', fontSize: '0.85em', opacity: 0.7 }}>({installmentNumber}/{expense.installments})</span>}
+                </strong>
                 <span>{t(`category.${category.key}`)}</span>
               </div>
               <div className="expense-item__amount">

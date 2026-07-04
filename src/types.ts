@@ -8,6 +8,8 @@ export type CategoryKey =
   | 'leisure'
   | 'health'
   | 'education'
+  | 'card'
+  | 'gifts'
   | 'other';
 
 export type Category = {
@@ -17,12 +19,18 @@ export type Category = {
   gradient: string;
 };
 
+export type PaymentMethod = 'cash' | 'credit';
+
 export type Expense = {
   id: string;
   title: string;
   amount: number;
   category: CategoryKey;
   createdAt: string;
+  paymentMethod: PaymentMethod;
+  installments?: number;
+  installmentGroupId?: string;
+  dueDate?: string;
 };
 
 export type FinanceState = {
@@ -38,4 +46,7 @@ export type ExpenseDraft = {
   title: string;
   amount: string;
   category: CategoryKey;
+  paymentMethod: PaymentMethod;
+  installments: number;
+  dueDate: string;
 };

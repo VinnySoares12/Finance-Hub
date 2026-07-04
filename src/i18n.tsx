@@ -88,6 +88,8 @@ const messages: Record<Language, Record<string, string>> = {
     'category.leisure': 'Lazer',
     'category.health': 'Saúde',
     'category.education': 'Educação',
+    'category.card': 'Cartão',
+    'category.gifts': 'Presentes',
     'category.other': 'Outros'
   },
   en: {
@@ -168,6 +170,8 @@ const messages: Record<Language, Record<string, string>> = {
     'category.leisure': 'Leisure',
     'category.health': 'Health',
     'category.education': 'Education',
+    'category.card': 'Credit Card',
+    'category.gifts': 'Gifts',
     'category.other': 'Other'
   },
   es: {
@@ -248,6 +252,8 @@ const messages: Record<Language, Record<string, string>> = {
     'category.leisure': 'Ocio',
     'category.health': 'Salud',
     'category.education': 'Educación',
+    'category.card': 'Tarjeta',
+    'category.gifts': 'Regalos',
     'category.other': 'Otros'
   }
 };

@@ -10,6 +10,8 @@ export const categories: Category[] = [
   { key: 'leisure', label: 'Lazer', emoji: '🎮', gradient: 'from-purple' },
   { key: 'health', label: 'Saúde', emoji: '🩺', gradient: 'from-lime' },
   { key: 'education', label: 'Educação', emoji: '📚', gradient: 'from-orange' },
+  { key: 'card', label: 'Cartão', emoji: '💳', gradient: 'from-indigo' },
+  { key: 'gifts', label: 'Presentes', emoji: '🎁', gradient: 'from-pink' },
   { key: 'other', label: 'Outros', emoji: '✨', gradient: 'from-slate' }
 ];
 

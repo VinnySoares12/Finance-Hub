@@ -10,7 +10,7 @@ import { LanguageSelector } from './components/LanguageSelector';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useI18n } from './i18n';
 import { exportExpensesToExcel } from './utils/formatters';
-import type { CategoryKey, Expense, FinanceState } from './types';
+import type { CategoryKey, Expense, FinanceState, PaymentMethod } from './types';
 
 const now = new Date();
 const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -28,21 +28,24 @@ const initialFinanceState: FinanceState = {
       title: 'Compras de mercado',
       amount: 620,
       category: 'market',
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      paymentMethod: 'cash'
     },
     {
       id: 'seed-electricity',
       title: 'Conta de luz',
       amount: 180,
       category: 'electricity',
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      paymentMethod: 'cash'
     },
     {
       id: 'seed-transport',
       title: 'Uber / transporte',
       amount: 300,
       category: 'transport',
-      createdAt: new Date().toISOString()
+      createdAt: new Date().toISOString(),
+      paymentMethod: 'cash'
     }
   ]
 };
@@ -173,18 +176,73 @@ function App() {
     setGoalError('');
   };
 
-  const handleAddExpense = (title: string, amount: number, category: CategoryKey) => {
-    const expense: Expense = {
-      id: generateId(),
-      title,
-      amount,
-      category,
-      createdAt: `${selectedMonth}-01T12:00:00.000Z`
-    };
+  const handleAddExpense = (title: string, amount: number, category: CategoryKey, paymentMethod: PaymentMethod, installments: number, dueDate: string) => {
+    const expensesToAdd: Expense[] = [];
+    const installmentGroupId = generateId();
+
+    if (paymentMethod === 'credit' && installments > 1) {
+      const installmentAmount = amount / installments;
+
+      const [currentYear, currentMonth] = selectedMonth.split('-').map(Number);
+      let startMonth = currentMonth;
+      let startYear = currentYear;
+
+      if (dueDate) {
+        const [dueYear, dueMonth] = dueDate.split('-').map(Number);
+        startMonth = dueMonth;
+        startYear = dueYear;
+      } else {
+        startMonth = currentMonth + 1;
+        if (startMonth > 12) {
+          startMonth -= 12;
+          startYear += 1;
+        }
+      }
+
+      for (let i = 0; i < installments; i++) {
+        let targetMonth = startMonth + i;
+        let targetYear = startYear;
+
+        while (targetMonth > 12) {
+          targetMonth -= 12;
+          targetYear += 1;
+        }
+
+        const monthKey = `${targetYear}-${String(targetMonth).padStart(2, '0')}`;
+
+        const expense: Expense = {
+          id: generateId(),
+          title,
+          amount: installmentAmount,
+          category,
+          paymentMethod,
+          installments: i === 0 ? installments : undefined,
+          installmentGroupId,
+          dueDate: dueDate ? dueDate : undefined,
+          createdAt: `${monthKey}-01T12:00:00.000Z`
+        };
+
+        expensesToAdd.push(expense);
+      }
+    } else {
+      const createdAtMonth = dueDate ? dueDate.slice(0, 7) : selectedMonth;
+
+      const expense: Expense = {
+        id: generateId(),
+        title,
+        amount,
+        category,
+        paymentMethod,
+        dueDate: dueDate ? dueDate : undefined,
+        createdAt: `${createdAtMonth}-01T12:00:00.000Z`
+      };
+
+      expensesToAdd.push(expense);
+    }
 
     setFinance((current) => ({
       ...current,
-      expenses: [expense, ...current.expenses]
+      expenses: [...expensesToAdd, ...current.expenses]
     }));
   };
 
