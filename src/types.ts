@@ -38,6 +38,7 @@ export type FinanceState = {
   savingsPercent: number;
   goalName: string;
   goalAmount: number;
+  initialSaved: number;
   monthlySavings: Record<string, number>;
   expenses: Expense[];
 };

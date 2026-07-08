@@ -21,6 +21,7 @@ const initialFinanceState: FinanceState = {
   savingsPercent: 20,
   goalName: '',
   goalAmount: 0,
+  initialSaved: 0,
   monthlySavings: {},
   expenses: [
     {
@@ -76,6 +77,7 @@ function App() {
   const [isMonthMenuOpen, setIsMonthMenuOpen] = useState(false);
   const [goalDraftName, setGoalDraftName] = useState(finance.goalName ?? '');
   const [goalDraftAmount, setGoalDraftAmount] = useState(finance.goalAmount ?? 0);
+  const [goalDraftInitialSaved, setGoalDraftInitialSaved] = useState(finance.initialSaved ?? 0);
   const [goalError, setGoalError] = useState('');
 
   useEffect(() => {
@@ -106,8 +108,8 @@ function App() {
   const selectedMonthLabel = months.find((month) => month.key === selectedMonth)?.label ?? '';
 
   const totalSaved = useMemo(
-    () => Object.values(monthlySavings).reduce((sum, value) => sum + Math.max(value, 0), 0),
-    [monthlySavings]
+    () => (finance.initialSaved ?? 0) + Object.values(monthlySavings).reduce((sum, value) => sum + Math.max(value, 0), 0),
+    [monthlySavings, finance.initialSaved]
   );
 
   const selectedMonthExpenses = useMemo(
@@ -160,7 +162,8 @@ function App() {
     setFinance((current) => ({
       ...current,
       goalName: name,
-      goalAmount: goalDraftAmount
+      goalAmount: goalDraftAmount,
+      initialSaved: goalDraftInitialSaved
     }));
     setGoalError('');
   };
@@ -169,10 +172,12 @@ function App() {
     setFinance((current) => ({
       ...current,
       goalName: '',
-      goalAmount: 0
+      goalAmount: 0,
+      initialSaved: 0
     }));
     setGoalDraftName('');
     setGoalDraftAmount(0);
+    setGoalDraftInitialSaved(0);
     setGoalError('');
   };
 
@@ -386,6 +391,15 @@ function App() {
                     value={goalDraftAmount}
                     onValueChange={setGoalDraftAmount}
                     placeholder="Ex: 20000"
+                  />
+                </label>
+
+                <label title={t('initialSavedHint')}>
+                  {t('initialSaved')}
+                  <MoneyInput
+                    value={goalDraftInitialSaved}
+                    onValueChange={setGoalDraftInitialSaved}
+                    placeholder="Ex: 100000"
                   />
                 </label>
               </div>
