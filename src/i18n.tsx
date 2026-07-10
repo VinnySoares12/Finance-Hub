@@ -1,5 +1,6 @@
 import { createContext, useContext, useEffect, useMemo, useState } from 'react';
 import type { ReactNode } from 'react';
+import { categoryName, subcategoryName } from './data/categories';
 
 export type Language = 'pt' | 'en' | 'es';
 
@@ -67,9 +68,23 @@ const messages: Record<Language, Record<string, string>> = {
     expensePlaceholder: 'Ex: Uber, mercado, água...',
     value: 'Valor',
     category: 'Categoria',
+    subcategory: 'Subcategoria',
+    selectCategoryPlaceholder: 'Selecione uma categoria',
+    selectSubcategoryPlaceholder: 'Selecione uma subcategoria',
+    subcategoryDisabledHint: 'Selecione uma categoria primeiro',
+    searchPlaceholder: 'Buscar...',
+    noResults: 'Nenhum resultado encontrado',
     addExpense: 'Adicionar gasto',
     expenseNameError: 'Digite o nome do gasto.',
     expenseValueError: 'Digite um valor maior que zero.',
+    expenseCategoryError: 'Selecione uma categoria.',
+    expenseSubcategoryError: 'Selecione uma subcategoria.',
+    paymentMethod: 'Forma de Pagamento',
+    paymentCash: 'À Vista (Dinheiro/Débito/PIX)',
+    paymentCredit: 'Cartão de Crédito',
+    installments: 'Parcelas',
+    dueDate: 'Data de Vencimento (Opcional)',
+    dueDateRecurringHint: ' - Para contas recorrentes',
     noExpenses: 'Nenhum gasto cadastrado ainda',
     noExpensesText: 'Adicione seus gastos do mês para ver a sobra atualizar automaticamente.',
     monthlyExpenses: 'Gastos do mês',
@@ -80,19 +95,7 @@ const messages: Record<Language, Record<string, string>> = {
     moneyDestination: 'Onde seu dinheiro está indo',
     categoryEmpty: 'Cadastre gastos para visualizar a distribuição por categoria.',
     rights: 'Todos os direitos reservados.',
-    madeBy: 'Feito por Vinicius Soares',
-    'category.market': 'Mercado',
-    'category.transport': 'Uber / Transporte',
-    'category.water': 'Água',
-    'category.electricity': 'Luz',
-    'category.internet': 'Internet',
-    'category.housing': 'Casa / Aluguel',
-    'category.leisure': 'Lazer',
-    'category.health': 'Saúde',
-    'category.education': 'Educação',
-    'category.card': 'Cartão',
-    'category.gifts': 'Presentes',
-    'category.other': 'Outros'
+    madeBy: 'Feito por Vinicius Soares'
   },
   en: {
     selectedMonth: 'Selected month',
@@ -151,9 +154,23 @@ const messages: Record<Language, Record<string, string>> = {
     expensePlaceholder: 'E.g. Uber, groceries, water...',
     value: 'Amount',
     category: 'Category',
+    subcategory: 'Subcategory',
+    selectCategoryPlaceholder: 'Select a category',
+    selectSubcategoryPlaceholder: 'Select a subcategory',
+    subcategoryDisabledHint: 'Select a category first',
+    searchPlaceholder: 'Search...',
+    noResults: 'No results found',
     addExpense: 'Add expense',
     expenseNameError: 'Enter an expense name.',
     expenseValueError: 'Enter an amount greater than zero.',
+    expenseCategoryError: 'Select a category.',
+    expenseSubcategoryError: 'Select a subcategory.',
+    paymentMethod: 'Payment method',
+    paymentCash: 'One-time (Cash/Debit/PIX)',
+    paymentCredit: 'Credit Card',
+    installments: 'Installments',
+    dueDate: 'Due date (optional)',
+    dueDateRecurringHint: ' - For recurring bills',
     noExpenses: 'No expenses added yet',
     noExpensesText: 'Add your monthly expenses to see the available balance update automatically.',
     monthlyExpenses: 'Monthly expenses',
@@ -164,19 +181,7 @@ const messages: Record<Language, Record<string, string>> = {
     moneyDestination: 'Where your money is going',
     categoryEmpty: 'Add expenses to see the distribution by category.',
     rights: 'All rights reserved.',
-    madeBy: 'Made by Vinicius Soares',
-    'category.market': 'Groceries',
-    'category.transport': 'Uber / Transport',
-    'category.water': 'Water',
-    'category.electricity': 'Electricity',
-    'category.internet': 'Internet',
-    'category.housing': 'Home / Rent',
-    'category.leisure': 'Leisure',
-    'category.health': 'Health',
-    'category.education': 'Education',
-    'category.card': 'Credit Card',
-    'category.gifts': 'Gifts',
-    'category.other': 'Other'
+    madeBy: 'Made by Vinicius Soares'
   },
   es: {
     selectedMonth: 'Mes seleccionado',
@@ -235,9 +240,23 @@ const messages: Record<Language, Record<string, string>> = {
     expensePlaceholder: 'Ej: Uber, mercado, agua...',
     value: 'Valor',
     category: 'Categoría',
+    subcategory: 'Subcategoría',
+    selectCategoryPlaceholder: 'Selecciona una categoría',
+    selectSubcategoryPlaceholder: 'Selecciona una subcategoría',
+    subcategoryDisabledHint: 'Selecciona una categoría primero',
+    searchPlaceholder: 'Buscar...',
+    noResults: 'No se encontraron resultados',
     addExpense: 'Agregar gasto',
     expenseNameError: 'Escribe el nombre del gasto.',
     expenseValueError: 'Escribe un valor mayor que cero.',
+    expenseCategoryError: 'Selecciona una categoría.',
+    expenseSubcategoryError: 'Selecciona una subcategoría.',
+    paymentMethod: 'Forma de pago',
+    paymentCash: 'Al contado (Efectivo/Débito/PIX)',
+    paymentCredit: 'Tarjeta de Crédito',
+    installments: 'Cuotas',
+    dueDate: 'Fecha de vencimiento (opcional)',
+    dueDateRecurringHint: ' - Para cuentas recurrentes',
     noExpenses: 'Aún no hay gastos registrados',
     noExpensesText: 'Agrega tus gastos del mes para actualizar automáticamente el saldo disponible.',
     monthlyExpenses: 'Gastos del mes',
@@ -248,19 +267,7 @@ const messages: Record<Language, Record<string, string>> = {
     moneyDestination: 'A dónde va tu dinero',
     categoryEmpty: 'Registra gastos para ver la distribución por categoría.',
     rights: 'Todos los derechos reservados.',
-    madeBy: 'Hecho por Vinicius Soares',
-    'category.market': 'Mercado',
-    'category.transport': 'Uber / Transporte',
-    'category.water': 'Agua',
-    'category.electricity': 'Electricidad',
-    'category.internet': 'Internet',
-    'category.housing': 'Casa / Alquiler',
-    'category.leisure': 'Ocio',
-    'category.health': 'Salud',
-    'category.education': 'Educación',
-    'category.card': 'Tarjeta',
-    'category.gifts': 'Regalos',
-    'category.other': 'Otros'
+    madeBy: 'Hecho por Vinicius Soares'
   }
 };
 
@@ -271,6 +278,8 @@ type I18nValue = {
   t: (key: string, values?: Record<string, string | number>) => string;
   currency: (value: number) => string;
   percent: (value: number) => string;
+  categoryLabel: (categoryKey: string) => string;
+  subcategoryLabel: (categoryKey: string, subcategoryKey: string) => string;
 };
 
 const I18nContext = createContext<I18nValue | null>(null);
@@ -310,7 +319,9 @@ export function I18nProvider({ children }: { children: ReactNode }) {
       percent: (amount) => new Intl.NumberFormat(locale, {
         style: 'percent',
         maximumFractionDigits: 1
-      }).format((amount || 0) / 100)
+      }).format((amount || 0) / 100),
+      categoryLabel: (categoryKey) => categoryName(categoryKey, language),
+      subcategoryLabel: (categoryKey, subcategoryKey) => subcategoryName(categoryKey, subcategoryKey, language)
     };
   }, [language]);
 

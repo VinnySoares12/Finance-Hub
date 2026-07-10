@@ -1,4 +1,4 @@
-import type { CategoryKey, Expense } from '../types';
+import type { Expense } from '../types';
 
 export const currencyFormatter = new Intl.NumberFormat('pt-BR', {
   style: 'currency',
@@ -72,7 +72,7 @@ type ExcelExportOptions = {
     total: string;
     empty: string;
   };
-  getCategoryLabel: (category: CategoryKey) => string;
+  getCategoryLabel: (expense: Expense) => string;
 };
 
 const escapeXml = (value: string) => value
@@ -103,7 +103,7 @@ export const exportExpensesToExcel = ({
         const date = new Date(expense.createdAt).toLocaleDateString(locale);
         const amount = Number.isFinite(expense.amount) ? expense.amount : 0;
 
-        return `<Row>${excelStringCell(date)}${excelStringCell(expense.title)}${excelStringCell(getCategoryLabel(expense.category))}${excelNumberCell(amount, 'Currency')}</Row>`;
+        return `<Row>${excelStringCell(date)}${excelStringCell(expense.title)}${excelStringCell(getCategoryLabel(expense))}${excelNumberCell(amount, 'Currency')}</Row>`;
       }).join('')
     : `<Row>${excelStringCell(labels.empty)}</Row>`;
 

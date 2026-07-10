@@ -1,4 +1,4 @@
-import { getCategory } from '../data/categories';
+import { getCategory, getSubcategory } from '../data/categories';
 import type { Expense } from '../types';
 import { useI18n } from '../i18n';
 
@@ -8,7 +8,7 @@ type ExpenseListProps = {
 };
 
 export function ExpenseList({ expenses, onRemoveExpense }: ExpenseListProps) {
-  const { t, currency } = useI18n();
+  const { t, currency, categoryLabel, subcategoryLabel } = useI18n();
   if (!expenses.length) {
     return (
       <section className="panel empty-state">
@@ -32,19 +32,23 @@ export function ExpenseList({ expenses, onRemoveExpense }: ExpenseListProps) {
       <div className="expense-list__items">
         {expenses.map((expense) => {
           const category = getCategory(expense.category);
+          const subcategory = getSubcategory(expense.category, expense.subcategory);
+          const label = subcategory
+            ? `${categoryLabel(expense.category)} • ${subcategoryLabel(expense.category, expense.subcategory)}`
+            : categoryLabel(expense.category);
           const isInstallment = expense.installments && expense.installments > 1;
           const installmentNumber = isInstallment ? (expenses.filter((e) => e.installmentGroupId === expense.installmentGroupId &&
                                                                               new Date(e.createdAt) <= new Date(expense.createdAt)).length) : undefined;
 
           return (
             <article className="expense-item" key={expense.id}>
-              <div className={`expense-item__emoji ${category.gradient}`}>{category.emoji}</div>
+              <div className={`expense-item__emoji ${category.gradient}`}>{subcategory?.icon ?? category.icon}</div>
               <div className="expense-item__content">
                 <strong>
                   {expense.title}
                   {isInstallment && <span style={{ marginLeft: '8px', fontSize: '0.85em', opacity: 0.7 }}>({installmentNumber}/{expense.installments})</span>}
                 </strong>
-                <span>{t(`category.${category.key}`)}</span>
+                <span>{label}</span>
               </div>
               <div className="expense-item__amount">
                 <strong>{currency(expense.amount)}</strong>

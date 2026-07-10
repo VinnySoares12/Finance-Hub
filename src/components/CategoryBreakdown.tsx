@@ -8,7 +8,7 @@ type CategoryBreakdownProps = {
 };
 
 export function CategoryBreakdown({ expenses, totalExpenses }: CategoryBreakdownProps) {
-  const { t, currency } = useI18n();
+  const { t, currency, categoryLabel } = useI18n();
   const totals = categories
     .map((category) => {
       const amount = expenses
@@ -39,8 +39,8 @@ export function CategoryBreakdown({ expenses, totalExpenses }: CategoryBreakdown
           {totals.map((category) => (
             <div className="breakdown-row" key={category.key}>
               <div>
-                <span>{category.emoji}</span>
-                <strong>{t(`category.${category.key}`)}</strong>
+                <span>{category.icon}</span>
+                <strong>{categoryLabel(category.key)}</strong>
               </div>
               <div className="breakdown-row__bar">
                 <i style={{ width: `${category.percent}%` }} />

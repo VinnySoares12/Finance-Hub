@@ -10,7 +10,8 @@ import { LanguageSelector } from './components/LanguageSelector';
 import { useLocalStorage } from './hooks/useLocalStorage';
 import { useI18n } from './i18n';
 import { exportExpensesToExcel } from './utils/formatters';
-import type { CategoryKey, Expense, FinanceState, PaymentMethod } from './types';
+import { getSubcategory, resolveCategory } from './data/categories';
+import type { CategoryKey, Expense, FinanceState, PaymentMethod, SubcategoryKey } from './types';
 
 const now = new Date();
 const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
@@ -28,7 +29,8 @@ const initialFinanceState: FinanceState = {
       id: 'seed-market',
       title: 'Compras de mercado',
       amount: 620,
-      category: 'market',
+      category: 'food',
+      subcategory: 'groceries',
       createdAt: new Date().toISOString(),
       paymentMethod: 'cash'
     },
@@ -36,7 +38,8 @@ const initialFinanceState: FinanceState = {
       id: 'seed-electricity',
       title: 'Conta de luz',
       amount: 180,
-      category: 'electricity',
+      category: 'housing',
+      subcategory: 'electricity',
       createdAt: new Date().toISOString(),
       paymentMethod: 'cash'
     },
@@ -44,7 +47,8 @@ const initialFinanceState: FinanceState = {
       id: 'seed-transport',
       title: 'Uber / transporte',
       amount: 300,
-      category: 'transport',
+      category: 'transportation',
+      subcategory: 'transport',
       createdAt: new Date().toISOString(),
       paymentMethod: 'cash'
     }
@@ -71,7 +75,7 @@ const getMonthsForYear = (year: number, locale: string) => (
 );
 
 function App() {
-  const { locale, t, currency, percent } = useI18n();
+  const { locale, t, currency, percent, categoryLabel, subcategoryLabel } = useI18n();
   const [finance, setFinance] = useLocalStorage<FinanceState>('finance-hub-state', initialFinanceState);
   const [selectedMonth, setSelectedMonth] = useState(currentMonthKey);
   const [isMonthMenuOpen, setIsMonthMenuOpen] = useState(false);
@@ -87,14 +91,28 @@ function App() {
       const needsMonthlySavings = !current.monthlySavings;
       const hasLegacyExampleSalary = current.salary === 5000;
 
-      if (!hasLegacyExampleGoal && !needsMonthlySavings && !hasLegacyExampleSalary) return current;
+      // Migrate expenses saved before the Category -> Subcategory taxonomy.
+      let expensesChanged = false;
+      const migratedExpenses = current.expenses.map((expense) => {
+        const resolved = resolveCategory(expense.category, expense.subcategory);
+        if (resolved.category === expense.category && resolved.subcategory === expense.subcategory) {
+          return expense;
+        }
+        expensesChanged = true;
+        return { ...expense, category: resolved.category, subcategory: resolved.subcategory };
+      });
+
+      if (!hasLegacyExampleGoal && !needsMonthlySavings && !hasLegacyExampleSalary && !expensesChanged) {
+        return current;
+      }
 
       return {
         ...current,
         salary: hasLegacyExampleSalary ? 0 : current.salary,
         goalName: hasLegacyExampleGoal ? '' : current.goalName,
         goalAmount: hasLegacyExampleGoal ? 0 : current.goalAmount,
-        monthlySavings: current.monthlySavings ?? {}
+        monthlySavings: current.monthlySavings ?? {},
+        expenses: expensesChanged ? migratedExpenses : current.expenses
       };
     });
   }, [setFinance]);
@@ -181,7 +199,7 @@ function App() {
     setGoalError('');
   };
 
-  const handleAddExpense = (title: string, amount: number, category: CategoryKey, paymentMethod: PaymentMethod, installments: number, dueDate: string) => {
+  const handleAddExpense = (title: string, amount: number, category: CategoryKey, subcategory: SubcategoryKey, paymentMethod: PaymentMethod, installments: number, dueDate: string) => {
     const expensesToAdd: Expense[] = [];
     const installmentGroupId = generateId();
 
@@ -220,6 +238,7 @@ function App() {
           title,
           amount: installmentAmount,
           category,
+          subcategory,
           paymentMethod,
           installments: i === 0 ? installments : undefined,
           installmentGroupId,
@@ -237,6 +256,7 @@ function App() {
         title,
         amount,
         category,
+        subcategory,
         paymentMethod,
         dueDate: dueDate ? dueDate : undefined,
         createdAt: `${createdAtMonth}-01T12:00:00.000Z`
@@ -291,7 +311,12 @@ function App() {
         total: t('exportTotal'),
         empty: t('noExpenses')
       },
-      getCategoryLabel: (category) => t(`category.${category}`)
+      getCategoryLabel: (expense) => {
+        const subcategory = getSubcategory(expense.category, expense.subcategory);
+        return subcategory
+          ? `${categoryLabel(expense.category)} • ${subcategoryLabel(expense.category, expense.subcategory)}`
+          : categoryLabel(expense.category);
+      }
     });
   };
 
