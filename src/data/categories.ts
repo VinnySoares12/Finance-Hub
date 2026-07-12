@@ -17,7 +17,11 @@ export const categories: Category[] = [
       { key: 'coffee', name: 'Coffee', icon: '☕' },
       { key: 'delivery', name: 'Delivery', icon: '🥡' },
       { key: 'bakery', name: 'Bakery', icon: '🥐' },
-      { key: 'bar', name: 'Bar / Drinks', icon: '🍺' }
+      { key: 'bar', name: 'Bar / Drinks', icon: '🍺' },
+      { key: 'mcdonalds', name: "McDonald's", icon: '🍟' },
+      { key: 'burger-king', name: 'Burger King', icon: '🍔' },
+      { key: 'bobs', name: "Bob's", icon: '🍔' },
+      { key: 'subway', name: 'Subway', icon: '🥪' }
     ]
   },
   {
@@ -211,14 +215,11 @@ export const categories: Category[] = [
   },
   {
     key: 'family',
-    name: 'Family & Others',
+    name: 'Other',
     icon: '🎁',
     gradient: 'from-red',
     subcategories: [
       { key: 'gifts', name: 'Gifts', icon: '🎁' },
-      { key: 'donations', name: 'Donations', icon: '❤️' },
-      { key: 'children', name: 'Children', icon: '👶' },
-      { key: 'childcare', name: 'Childcare', icon: '🍼' },
       { key: 'other', name: 'Other', icon: '✨' }
     ]
   }
@@ -305,7 +306,7 @@ const categoryNames: Record<CategoryKey, NameTranslations> = {
   travel: { pt: 'Viagem', es: 'Viaje' },
   pets: { pt: 'Pets', es: 'Mascotas' },
   finance: { pt: 'Finanças', es: 'Finanzas' },
-  family: { pt: 'Família & Outros', es: 'Familia y Otros' }
+  family: { pt: 'Outros', es: 'Otros' }
 };
 
 // Keyed by `${categoryKey}.${subcategoryKey}`.
@@ -411,9 +412,6 @@ const subcategoryNames: Record<string, NameTranslations> = {
   'finance.bank-fees': { pt: 'Tarifas Bancárias', es: 'Comisiones Bancarias' },
 
   'family.gifts': { pt: 'Presentes', es: 'Regalos' },
-  'family.donations': { pt: 'Doações', es: 'Donaciones' },
-  'family.children': { pt: 'Filhos', es: 'Hijos' },
-  'family.childcare': { pt: 'Creche / Babá', es: 'Guardería' },
   'family.other': { pt: 'Outros', es: 'Otros' }
 };
 
