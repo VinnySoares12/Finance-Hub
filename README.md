@@ -25,7 +25,8 @@ O projeto foi pensado para ser simples no uso, mas com uma interface mais agrad�
 * Cálculo automático dos gastos.
 * Visualização da sobra disponível.
 * Organização dos gastos por categoria.
-* Dados salvos no navegador com `localStorage`.
+* Conta pessoal com login por e-mail e senha.
+* Dados salvos na nuvem e isolados por usuário, acessíveis de qualquer dispositivo.
 * Interface responsiva para desktop e celular.
 * Card interativo com efeito 3D baseado no movimento do mouse.
 
@@ -37,3 +38,34 @@ O projeto foi pensado para ser simples no uso, mas com uma interface mais agrad�
 * TypeScript
 * Vite
 * CSS
+* Supabase (autenticação e banco de dados)
+
+---
+
+## Configuração
+
+### 1. Variáveis de ambiente
+
+Copie `.env.example` para `.env.local` e preencha com as credenciais do seu
+projeto Supabase (painel > Project Settings > API):
+
+```env
+VITE_SUPABASE_URL=https://seu-projeto.supabase.co
+VITE_SUPABASE_ANON_KEY=sua-chave-anon
+```
+
+A chave `anon` é pública por natureza e vai no bundle do navegador — quem
+protege os dados é o Row Level Security, não o sigilo dela. A chave
+`service_role` nunca deve ser usada neste projeto: ela ignora o RLS.
+
+### 2. Banco de dados
+
+Aplique a migration em `supabase/migrations/` antes do primeiro uso, via
+`supabase db push` ou colando o SQL no SQL Editor do painel.
+
+### 3. Rodar
+
+```bash
+npm install
+npm run dev
+```

@@ -1,4 +1,5 @@
 import { useEffect, useMemo, useState } from 'react';
+import { AccountMenu } from './components/AccountMenu';
 import { CategoryBreakdown } from './components/CategoryBreakdown';
 import { ExpenseForm } from './components/ExpenseForm';
 import { ExpenseList } from './components/ExpenseList';
@@ -7,61 +8,16 @@ import { MetricCard } from './components/MetricCard';
 import { MoneyInput } from './components/MoneyInput';
 import { MonthMenu } from './components/MonthMenu';
 import { LanguageSelector } from './components/LanguageSelector';
-import { useLocalStorage } from './hooks/useLocalStorage';
+import { useFinanceState } from './hooks/useFinanceState';
 import { useI18n } from './i18n';
 import { exportExpensesToExcel } from './utils/formatters';
-import { getSubcategory, resolveCategory } from './data/categories';
-import type { CategoryKey, Expense, FinanceState, PaymentMethod, SubcategoryKey } from './types';
+import { uuid } from './utils/id';
+import { getSubcategory } from './data/categories';
+import type { CategoryKey, Expense, PaymentMethod, SubcategoryKey } from './types';
 
 const now = new Date();
 const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 const availableYears = Array.from({ length: 14 }, (_, index) => now.getFullYear() - 3 + index);
-
-const initialFinanceState: FinanceState = {
-  salary: 0,
-  savingsPercent: 20,
-  goalName: '',
-  goalAmount: 0,
-  initialSaved: 0,
-  monthlySavings: {},
-  expenses: [
-    {
-      id: 'seed-market',
-      title: 'Compras de mercado',
-      amount: 620,
-      category: 'food',
-      subcategory: 'groceries',
-      createdAt: new Date().toISOString(),
-      paymentMethod: 'cash'
-    },
-    {
-      id: 'seed-electricity',
-      title: 'Conta de luz',
-      amount: 180,
-      category: 'housing',
-      subcategory: 'electricity',
-      createdAt: new Date().toISOString(),
-      paymentMethod: 'cash'
-    },
-    {
-      id: 'seed-transport',
-      title: 'Uber / transporte',
-      amount: 300,
-      category: 'transportation',
-      subcategory: 'transport',
-      createdAt: new Date().toISOString(),
-      paymentMethod: 'cash'
-    }
-  ]
-};
-
-const generateId = () => {
-  if (typeof crypto !== 'undefined' && 'randomUUID' in crypto) {
-    return crypto.randomUUID();
-  }
-
-  return `${Date.now()}-${Math.random().toString(16).slice(2)}`;
-};
 
 const getMonthsForYear = (year: number, locale: string) => (
   Array.from({ length: 12 }, (_, monthIndex) => {
@@ -76,46 +32,21 @@ const getMonthsForYear = (year: number, locale: string) => (
 
 function App() {
   const { locale, t, currency, percent, categoryLabel, subcategoryLabel } = useI18n();
-  const [finance, setFinance] = useLocalStorage<FinanceState>('finance-hub-state', initialFinanceState);
+  const [finance, setFinance, syncStatus] = useFinanceState();
   const [selectedMonth, setSelectedMonth] = useState(currentMonthKey);
   const [isMonthMenuOpen, setIsMonthMenuOpen] = useState(false);
-  const [goalDraftName, setGoalDraftName] = useState(finance.goalName ?? '');
-  const [goalDraftAmount, setGoalDraftAmount] = useState(finance.goalAmount ?? 0);
-  const [goalDraftInitialSaved, setGoalDraftInitialSaved] = useState(finance.initialSaved ?? 0);
+  const [goalDraftName, setGoalDraftName] = useState('');
+  const [goalDraftAmount, setGoalDraftAmount] = useState(0);
+  const [goalDraftInitialSaved, setGoalDraftInitialSaved] = useState(0);
   const [goalError, setGoalError] = useState('');
 
+  // Os rascunhos da meta não podem mais ser semeados no useState inicial: o
+  // estado agora chega do Supabase depois da primeira renderização.
   useEffect(() => {
-    setFinance((current) => {
-      const hasLegacyExampleGoal =
-        current.goalName === 'Minha liberdade financeira' && current.goalAmount === 12000;
-      const needsMonthlySavings = !current.monthlySavings;
-      const hasLegacyExampleSalary = current.salary === 5000;
-
-      // Migrate expenses saved before the Category -> Subcategory taxonomy.
-      let expensesChanged = false;
-      const migratedExpenses = current.expenses.map((expense) => {
-        const resolved = resolveCategory(expense.category, expense.subcategory);
-        if (resolved.category === expense.category && resolved.subcategory === expense.subcategory) {
-          return expense;
-        }
-        expensesChanged = true;
-        return { ...expense, category: resolved.category, subcategory: resolved.subcategory };
-      });
-
-      if (!hasLegacyExampleGoal && !needsMonthlySavings && !hasLegacyExampleSalary && !expensesChanged) {
-        return current;
-      }
-
-      return {
-        ...current,
-        salary: hasLegacyExampleSalary ? 0 : current.salary,
-        goalName: hasLegacyExampleGoal ? '' : current.goalName,
-        goalAmount: hasLegacyExampleGoal ? 0 : current.goalAmount,
-        monthlySavings: current.monthlySavings ?? {},
-        expenses: expensesChanged ? migratedExpenses : current.expenses
-      };
-    });
-  }, [setFinance]);
+    setGoalDraftName(finance.goalName ?? '');
+    setGoalDraftAmount(finance.goalAmount ?? 0);
+    setGoalDraftInitialSaved(finance.initialSaved ?? 0);
+  }, [finance.goalName, finance.goalAmount, finance.initialSaved]);
 
   const months = useMemo(
     () => getMonthsForYear(Number(selectedMonth.slice(0, 4)), locale),
@@ -201,7 +132,7 @@ function App() {
 
   const handleAddExpense = (title: string, amount: number, category: CategoryKey, subcategory: SubcategoryKey, paymentMethod: PaymentMethod, installments: number, dueDate: string) => {
     const expensesToAdd: Expense[] = [];
-    const installmentGroupId = generateId();
+    const installmentGroupId = uuid();
 
     if (paymentMethod === 'credit' && installments > 1) {
       const installmentAmount = amount / installments;
@@ -234,7 +165,7 @@ function App() {
         const monthKey = `${targetYear}-${String(targetMonth).padStart(2, '0')}`;
 
         const expense: Expense = {
-          id: generateId(),
+          id: uuid(),
           title,
           amount: installmentAmount,
           category,
@@ -252,7 +183,7 @@ function App() {
       const createdAtMonth = dueDate ? dueDate.slice(0, 7) : selectedMonth;
 
       const expense: Expense = {
-        id: generateId(),
+        id: uuid(),
         title,
         amount,
         category,
@@ -337,7 +268,10 @@ function App() {
       />
 
       <main className="app-shell">
-        <LanguageSelector />
+        <div className="top-bar">
+          <AccountMenu syncStatus={syncStatus} />
+          <LanguageSelector />
+        </div>
 
         <div className="selected-month-chip">
           <span>{t('selectedMonth')}</span>
