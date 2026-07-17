@@ -75,21 +75,15 @@ type ExcelExportOptions = {
   getCategoryLabel: (expense: Expense) => string;
 };
 
-const escapeXml = (value: string) => value
-  .replace(/&/g, '&amp;')
-  .replace(/</g, '&lt;')
-  .replace(/>/g, '&gt;')
-  .replace(/"/g, '&quot;')
-  .replace(/'/g, '&apos;')
-  .replace(/[\r\n]+/g, ' ');
+const HEADER_FILL = 'FFDDD6FE';
+const CURRENCY_FORMAT = '"R$" #,##0.00';
 
-const excelStringCell = (value: string, styleId?: string) =>
-  `<Cell${styleId ? ` ss:StyleID="${styleId}"` : ''}><Data ss:Type="String">${escapeXml(value)}</Data></Cell>`;
+// Nomes de aba do Excel nao aceitam estes caracteres nem passam de 31 letras;
+// o rotulo do mes (ex.: "julho de 2026") nunca deveria conter nenhum, mas
+// sanitizamos porque exceljs lanca excecao em runtime se um escapar.
+const sanitizeSheetName = (name: string) => name.replace(/[\\/*?:[\]]/g, '').slice(0, 31);
 
-const excelNumberCell = (value: number, styleId?: string) =>
-  `<Cell${styleId ? ` ss:StyleID="${styleId}"` : ''}><Data ss:Type="Number">${value}</Data></Cell>`;
-
-export const exportExpensesToExcel = ({
+export const exportExpensesToExcel = async ({
   expenses,
   monthLabel,
   monthKey,
@@ -98,50 +92,57 @@ export const exportExpensesToExcel = ({
   getCategoryLabel
 }: ExcelExportOptions) => {
   const total = expenses.reduce((sum, expense) => sum + (Number.isFinite(expense.amount) ? expense.amount : 0), 0);
-  const rows = expenses.length > 0
-    ? expenses.map((expense) => {
-        const date = new Date(expense.createdAt).toLocaleDateString(locale);
-        const amount = Number.isFinite(expense.amount) ? expense.amount : 0;
 
-        return `<Row>${excelStringCell(date)}${excelStringCell(expense.title)}${excelStringCell(getCategoryLabel(expense))}${excelNumberCell(amount, 'Currency')}</Row>`;
-      }).join('')
-    : `<Row>${excelStringCell(labels.empty)}</Row>`;
+  // Import dinamico: exceljs pesa ~250KB gzip e so' e' usado neste botao de
+  // exportar, entao carrega-lo no bundle principal penalizaria todo mundo
+  // (inclusive quem so' faz login) so' para uma acao que a maioria nao usa.
+  const { default: ExcelJS } = await import('exceljs');
+  const workbook = new ExcelJS.Workbook();
+  const sheetName = sanitizeSheetName(monthLabel) || monthKey;
+  const sheet = workbook.addWorksheet(sheetName || 'Despesas');
 
-  const worksheetName = monthLabel.slice(0, 31) || monthKey;
-  const spreadsheet = `<?xml version="1.0"?>
-<?mso-application progid="Excel.Sheet"?>
-<Workbook xmlns="urn:schemas-microsoft-com:office:spreadsheet"
- xmlns:o="urn:schemas-microsoft-com:office:office"
- xmlns:x="urn:schemas-microsoft-com:office:excel"
- xmlns:ss="urn:schemas-microsoft-com:office:spreadsheet">
- <Styles>
-  <Style ss:ID="Header"><Font ss:Bold="1"/><Interior ss:Color="#DDD6FE" ss:Pattern="Solid"/></Style>
-  <Style ss:ID="Title"><Font ss:Bold="1" ss:Size="14"/></Style>
-  <Style ss:ID="Currency"><NumberFormat ss:Format="&quot;R$&quot; #,##0.00"/></Style>
- </Styles>
- <Worksheet ss:Name="${escapeXml(worksheetName)}">
-  <Table>
-   <Column ss:Width="90"/><Column ss:Width="220"/><Column ss:Width="140"/><Column ss:Width="100"/>
-   <Row>${excelStringCell(`${labels.reportTitle} — ${monthLabel}`, 'Title')}</Row>
-   <Row/>
-   <Row>${excelStringCell(labels.date, 'Header')}${excelStringCell(labels.description, 'Header')}${excelStringCell(labels.category, 'Header')}${excelStringCell(labels.amount, 'Header')}</Row>
-   ${rows}
-   <Row/>
-   <Row>${excelStringCell(labels.total, 'Header')}<Cell/><Cell/>${excelNumberCell(total, 'Currency')}</Row>
-  </Table>
- </Worksheet>
-</Workbook>`;
+  sheet.columns = [{ width: 14 }, { width: 34 }, { width: 22 }, { width: 16 }];
 
-  // O conteudo gerado e' SpreadsheetML (XML), nao o binario BIFF do .xls de
-  // verdade. Com extensao .xls o Excel detecta a incompatibilidade e mostra
-  // um aviso de seguranca antes de abrir; com .xml ele reconhece o formato
-  // e abre direto.
-  const blob = new Blob([spreadsheet], { type: 'application/xml;charset=utf-8' });
+  sheet.mergeCells(1, 1, 1, 4);
+  const titleCell = sheet.getCell(1, 1);
+  titleCell.value = `${labels.reportTitle} — ${monthLabel}`;
+  titleCell.font = { bold: true, size: 14 };
+
+  sheet.addRow([]);
+
+  const headerRow = sheet.addRow([labels.date, labels.description, labels.category, labels.amount]);
+  headerRow.eachCell((cell) => {
+    cell.font = { bold: true };
+    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: HEADER_FILL } };
+  });
+
+  if (expenses.length > 0) {
+    expenses.forEach((expense) => {
+      const date = new Date(expense.createdAt).toLocaleDateString(locale);
+      const amount = Number.isFinite(expense.amount) ? expense.amount : 0;
+      const row = sheet.addRow([date, expense.title, getCategoryLabel(expense), amount]);
+      row.getCell(4).numFmt = CURRENCY_FORMAT;
+    });
+  } else {
+    sheet.addRow([labels.empty]);
+  }
+
+  sheet.addRow([]);
+
+  const totalRow = sheet.addRow([labels.total, '', '', total]);
+  totalRow.font = { bold: true };
+  totalRow.getCell(4).numFmt = CURRENCY_FORMAT;
+
+  const buffer = await workbook.xlsx.writeBuffer();
+
+  const blob = new Blob([buffer], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
 
   link.href = url;
-  link.download = `despesas-${monthKey}.xml`;
+  link.download = `despesas-${monthKey}.xlsx`;
   document.body.appendChild(link);
   link.click();
   link.remove();

@@ -228,7 +228,7 @@ function App() {
   };
 
   const handleExportExpenses = () => {
-    exportExpensesToExcel({
+    void exportExpensesToExcel({
       expenses: selectedMonthExpenses,
       monthLabel: selectedMonthLabel,
       monthKey: selectedMonth,
@@ -248,6 +248,8 @@ function App() {
           ? `${categoryLabel(expense.category)} • ${subcategoryLabel(expense.category, expense.subcategory)}`
           : categoryLabel(expense.category);
       }
+    }).catch((error: unknown) => {
+      console.error('[export] falha ao gerar arquivo do Excel', error);
     });
   };
 
