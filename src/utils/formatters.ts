@@ -132,12 +132,16 @@ export const exportExpensesToExcel = ({
  </Worksheet>
 </Workbook>`;
 
-  const blob = new Blob([spreadsheet], { type: 'application/vnd.ms-excel;charset=utf-8' });
+  // O conteudo gerado e' SpreadsheetML (XML), nao o binario BIFF do .xls de
+  // verdade. Com extensao .xls o Excel detecta a incompatibilidade e mostra
+  // um aviso de seguranca antes de abrir; com .xml ele reconhece o formato
+  // e abre direto.
+  const blob = new Blob([spreadsheet], { type: 'application/xml;charset=utf-8' });
   const url = URL.createObjectURL(blob);
   const link = document.createElement('a');
 
   link.href = url;
-  link.download = `despesas-${monthKey}.xls`;
+  link.download = `despesas-${monthKey}.xml`;
   document.body.appendChild(link);
   link.click();
   link.remove();
