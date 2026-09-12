@@ -8,7 +8,7 @@ type ExpenseListProps = {
 };
 
 export function ExpenseList({ expenses, onRemoveExpense }: ExpenseListProps) {
-  const { t, currency, categoryLabel, subcategoryLabel } = useI18n();
+  const { t, currency, categoryLabel, subcategoryLabel, locale } = useI18n();
   if (!expenses.length) {
     return (
       <section className="panel empty-state">
@@ -36,6 +36,7 @@ export function ExpenseList({ expenses, onRemoveExpense }: ExpenseListProps) {
           const label = subcategory
             ? `${categoryLabel(expense.category)} • ${subcategoryLabel(expense.category, expense.subcategory)}`
             : categoryLabel(expense.category);
+          const expenseDate = new Date(expense.createdAt).toLocaleDateString(locale);
           const isInstallment = expense.installments && expense.installments > 1;
           const installmentNumber = isInstallment ? (expenses.filter((e) => e.installmentGroupId === expense.installmentGroupId &&
                                                                               new Date(e.createdAt) <= new Date(expense.createdAt)).length) : undefined;
@@ -49,6 +50,7 @@ export function ExpenseList({ expenses, onRemoveExpense }: ExpenseListProps) {
                   {isInstallment && <span style={{ marginLeft: '8px', fontSize: '0.85em', opacity: 0.7 }}>({installmentNumber}/{expense.installments})</span>}
                 </strong>
                 <span>{label}</span>
+                <span className="expense-item__date">{expenseDate}</span>
               </div>
               <div className="expense-item__amount">
                 <strong>{currency(expense.amount)}</strong>
