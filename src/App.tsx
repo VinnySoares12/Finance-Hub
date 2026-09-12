@@ -19,6 +19,17 @@ const now = new Date();
 const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
 const availableYears = Array.from({ length: 14 }, (_, index) => now.getFullYear() - 3 + index);
 
+// month e' 1-indexado (1=Janeiro..12=Dezembro), ao contrario do Date do JS.
+const daysInMonth = (year: number, month: number) => new Date(year, month, 0).getDate();
+
+// Dia real a usar num createdAt: o do vencimento escolhido (se houver) ou o
+// de hoje, sempre limitado ao numero de dias que o mes de destino realmente
+// tem (ex.: hoje dia 31 lancado num mes de 30 dias vira dia 30).
+const resolveExpenseDay = (dueDate: string, targetYear: number, targetMonth: number) => {
+  const sourceDay = dueDate ? Number(dueDate.slice(8, 10)) : new Date().getDate();
+  return Math.min(sourceDay, daysInMonth(targetYear, targetMonth));
+};
+
 const getMonthsForYear = (year: number, locale: string) => (
   Array.from({ length: 12 }, (_, monthIndex) => {
     const date = new Date(year, monthIndex, 1);
@@ -163,6 +174,7 @@ function App() {
         }
 
         const monthKey = `${targetYear}-${String(targetMonth).padStart(2, '0')}`;
+        const day = resolveExpenseDay(dueDate, targetYear, targetMonth);
 
         const expense: Expense = {
           id: uuid(),
@@ -174,13 +186,15 @@ function App() {
           installments: i === 0 ? installments : undefined,
           installmentGroupId,
           dueDate: dueDate ? dueDate : undefined,
-          createdAt: `${monthKey}-01T12:00:00.000Z`
+          createdAt: `${monthKey}-${String(day).padStart(2, '0')}T12:00:00.000Z`
         };
 
         expensesToAdd.push(expense);
       }
     } else {
       const createdAtMonth = dueDate ? dueDate.slice(0, 7) : selectedMonth;
+      const [createdAtYear, createdAtMonthNum] = createdAtMonth.split('-').map(Number);
+      const day = resolveExpenseDay(dueDate, createdAtYear, createdAtMonthNum);
 
       const expense: Expense = {
         id: uuid(),
@@ -190,7 +204,7 @@ function App() {
         subcategory,
         paymentMethod,
         dueDate: dueDate ? dueDate : undefined,
-        createdAt: `${createdAtMonth}-01T12:00:00.000Z`
+        createdAt: `${createdAtMonth}-${String(day).padStart(2, '0')}T12:00:00.000Z`
       };
 
       expensesToAdd.push(expense);
