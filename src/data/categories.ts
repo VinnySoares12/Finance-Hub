@@ -284,135 +284,135 @@ export const resolveCategory = (
 // -----------------------------------------------------------------------------
 // Category / subcategory display names per language. The `name` field above is
 // the single source for English (and the label future custom categories will
-// carry), so these tables only hold the languages that differ from it — `pt`
-// and `es`. `en` therefore always resolves from `name`, avoiding a duplicated
-// English string that could silently drift out of sync.
+// carry), so these tables only hold the languages that differ from it — `pt`,
+// `es` and `it`. `en` therefore always resolves from `name`, avoiding a
+// duplicated English string that could silently drift out of sync.
 // Brand names (Netflix, Disney+, Spotify, ...) are omitted entirely — they fall
 // back to `name` and stay identical across all languages.
-type CategoryLang = 'pt' | 'en' | 'es';
+type CategoryLang = 'pt' | 'en' | 'es' | 'it';
 type NameTranslations = Partial<Record<CategoryLang, string>>;
 
 const categoryNames: Record<CategoryKey, NameTranslations> = {
-  food: { pt: 'Alimentação', es: 'Alimentación' },
-  transportation: { pt: 'Transporte', es: 'Transporte' },
-  housing: { pt: 'Moradia', es: 'Vivienda' },
-  'personal-care': { pt: 'Cuidados Pessoais', es: 'Cuidado Personal' },
-  health: { pt: 'Saúde & Bem-estar', es: 'Salud y Bienestar' },
-  shopping: { pt: 'Compras', es: 'Compras' },
-  entertainment: { pt: 'Entretenimento', es: 'Entretenimiento' },
-  subscriptions: { pt: 'Assinaturas', es: 'Suscripciones' },
-  education: { pt: 'Educação', es: 'Educación' },
-  work: { pt: 'Trabalho', es: 'Trabajo' },
-  travel: { pt: 'Viagem', es: 'Viaje' },
-  pets: { pt: 'Pets', es: 'Mascotas' },
-  finance: { pt: 'Finanças', es: 'Finanzas' },
-  family: { pt: 'Outros', es: 'Otros' }
+  food: { pt: 'Alimentação', es: 'Alimentación', it: 'Alimentazione' },
+  transportation: { pt: 'Transporte', es: 'Transporte', it: 'Trasporti' },
+  housing: { pt: 'Moradia', es: 'Vivienda', it: 'Casa' },
+  'personal-care': { pt: 'Cuidados Pessoais', es: 'Cuidado Personal', it: 'Cura Personale' },
+  health: { pt: 'Saúde & Bem-estar', es: 'Salud y Bienestar', it: 'Salute e Benessere' },
+  shopping: { pt: 'Compras', es: 'Compras', it: 'Shopping' },
+  entertainment: { pt: 'Entretenimento', es: 'Entretenimiento', it: 'Intrattenimento' },
+  subscriptions: { pt: 'Assinaturas', es: 'Suscripciones', it: 'Abbonamenti' },
+  education: { pt: 'Educação', es: 'Educación', it: 'Istruzione' },
+  work: { pt: 'Trabalho', es: 'Trabajo', it: 'Lavoro' },
+  travel: { pt: 'Viagem', es: 'Viaje', it: 'Viaggi' },
+  pets: { pt: 'Pets', es: 'Mascotas', it: 'Animali Domestici' },
+  finance: { pt: 'Finanças', es: 'Finanzas', it: 'Finanze' },
+  family: { pt: 'Outros', es: 'Otros', it: 'Altro' }
 };
 
 // Keyed by `${categoryKey}.${subcategoryKey}`.
 const subcategoryNames: Record<string, NameTranslations> = {
-  'food.groceries': { pt: 'Mercado', es: 'Supermercado' },
-  'food.restaurants': { pt: 'Restaurantes', es: 'Restaurantes' },
-  'food.coffee': { pt: 'Café', es: 'Café' },
-  'food.delivery': { pt: 'Delivery', es: 'Delivery' },
-  'food.bakery': { pt: 'Padaria', es: 'Panadería' },
-  'food.bar': { pt: 'Bar', es: 'Bar / Bebidas' },
+  'food.groceries': { pt: 'Mercado', es: 'Supermercado', it: 'Spesa' },
+  'food.restaurants': { pt: 'Restaurantes', es: 'Restaurantes', it: 'Ristoranti' },
+  'food.coffee': { pt: 'Café', es: 'Café', it: 'Caffè' },
+  'food.delivery': { pt: 'Delivery', es: 'Delivery', it: 'Delivery' },
+  'food.bakery': { pt: 'Padaria', es: 'Panadería', it: 'Panetteria' },
+  'food.bar': { pt: 'Bar', es: 'Bar / Bebidas', it: 'Bar / Drink' },
 
-  'transportation.transport': { pt: 'Uber / Transporte', es: 'Uber / Transporte' },
-  'transportation.public-transport': { pt: 'Transporte Público', es: 'Transporte Público' },
-  'transportation.fuel': { pt: 'Combustível', es: 'Combustible' },
-  'transportation.car-maintenance': { pt: 'Manutenção do Carro', es: 'Mantenimiento del Auto' },
-  'transportation.parking': { pt: 'Estacionamento', es: 'Estacionamiento' },
-  'transportation.tolls': { pt: 'Pedágio', es: 'Peaje' },
-  'transportation.car-insurance': { pt: 'Seguro do Carro', es: 'Seguro del Auto' },
-  'transportation.vehicle-tax': { pt: 'IPVA / Licenciamento', es: 'Impuesto Vehicular' },
+  'transportation.transport': { pt: 'Uber / Transporte', es: 'Uber / Transporte', it: 'Uber / Trasporto' },
+  'transportation.public-transport': { pt: 'Transporte Público', es: 'Transporte Público', it: 'Trasporto Pubblico' },
+  'transportation.fuel': { pt: 'Combustível', es: 'Combustible', it: 'Carburante' },
+  'transportation.car-maintenance': { pt: 'Manutenção do Carro', es: 'Mantenimiento del Auto', it: 'Manutenzione Auto' },
+  'transportation.parking': { pt: 'Estacionamento', es: 'Estacionamiento', it: 'Parcheggio' },
+  'transportation.tolls': { pt: 'Pedágio', es: 'Peaje', it: 'Pedaggio' },
+  'transportation.car-insurance': { pt: 'Seguro do Carro', es: 'Seguro del Auto', it: 'Assicurazione Auto' },
+  'transportation.vehicle-tax': { pt: 'IPVA / Licenciamento', es: 'Impuesto Vehicular', it: 'Bollo Auto' },
 
-  'housing.rent': { pt: 'Aluguel / Financiamento', es: 'Alquiler / Hipoteca' },
-  'housing.condo': { pt: 'Condomínio', es: 'Gastos de Comunidad' },
-  'housing.water': { pt: 'Água', es: 'Agua' },
-  'housing.electricity': { pt: 'Luz', es: 'Electricidad' },
-  'housing.internet': { pt: 'Internet', es: 'Internet' },
-  'housing.gas': { pt: 'Gás', es: 'Gas' },
-  'housing.property-tax': { pt: 'IPTU', es: 'Impuesto Predial' },
-  'housing.home-insurance': { pt: 'Seguro Residencial', es: 'Seguro de Hogar' },
-  'housing.cleaning': { pt: 'Produtos de Limpeza', es: 'Productos de Limpieza' },
-  'housing.domestic-help': { pt: 'Diarista / Empregada', es: 'Servicio Doméstico' },
-  'housing.furniture': { pt: 'Móveis', es: 'Muebles' },
-  'housing.home-repairs': { pt: 'Reparos', es: 'Reparaciones' },
-  'housing.decoration': { pt: 'Decoração', es: 'Decoración' },
+  'housing.rent': { pt: 'Aluguel / Financiamento', es: 'Alquiler / Hipoteca', it: 'Affitto / Mutuo' },
+  'housing.condo': { pt: 'Condomínio', es: 'Gastos de Comunidad', it: 'Spese Condominiali' },
+  'housing.water': { pt: 'Água', es: 'Agua', it: 'Acqua' },
+  'housing.electricity': { pt: 'Luz', es: 'Electricidad', it: 'Luce' },
+  'housing.internet': { pt: 'Internet', es: 'Internet', it: 'Internet' },
+  'housing.gas': { pt: 'Gás', es: 'Gas', it: 'Gas' },
+  'housing.property-tax': { pt: 'IPTU', es: 'Impuesto Predial', it: 'IMU' },
+  'housing.home-insurance': { pt: 'Seguro Residencial', es: 'Seguro de Hogar', it: 'Assicurazione Casa' },
+  'housing.cleaning': { pt: 'Produtos de Limpeza', es: 'Productos de Limpieza', it: 'Prodotti per la Pulizia' },
+  'housing.domestic-help': { pt: 'Diarista / Empregada', es: 'Servicio Doméstico', it: 'Colf / Aiuto Domestico' },
+  'housing.furniture': { pt: 'Móveis', es: 'Muebles', it: 'Mobili' },
+  'housing.home-repairs': { pt: 'Reparos', es: 'Reparaciones', it: 'Riparazioni' },
+  'housing.decoration': { pt: 'Decoração', es: 'Decoración', it: 'Decorazione' },
 
-  'personal-care.barbershop': { pt: 'Barbearia', es: 'Barbería' },
-  'personal-care.beauty-salon': { pt: 'Salão de Beleza', es: 'Salón de Belleza' },
-  'personal-care.spa': { pt: 'Spa / Massagem', es: 'Spa / Masaje' },
-  'personal-care.cosmetics': { pt: 'Cosméticos', es: 'Cosméticos' },
-  'personal-care.perfume': { pt: 'Perfumes', es: 'Perfume' },
-  'personal-care.personal-care': { pt: 'Cuidados Pessoais', es: 'Cuidado Personal' },
+  'personal-care.barbershop': { pt: 'Barbearia', es: 'Barbería', it: 'Barbiere' },
+  'personal-care.beauty-salon': { pt: 'Salão de Beleza', es: 'Salón de Belleza', it: 'Salone di Bellezza' },
+  'personal-care.spa': { pt: 'Spa / Massagem', es: 'Spa / Masaje', it: 'Spa / Massaggio' },
+  'personal-care.cosmetics': { pt: 'Cosméticos', es: 'Cosméticos', it: 'Cosmetici' },
+  'personal-care.perfume': { pt: 'Perfumes', es: 'Perfume', it: 'Profumi' },
+  'personal-care.personal-care': { pt: 'Cuidados Pessoais', es: 'Cuidado Personal', it: 'Cura Personale' },
 
-  'health.health': { pt: 'Saúde', es: 'Salud' },
-  'health.health-insurance': { pt: 'Plano de Saúde', es: 'Seguro Médico' },
-  'health.pharmacy': { pt: 'Farmácia', es: 'Farmacia' },
-  'health.dentist': { pt: 'Dentista', es: 'Dentista' },
-  'health.vision-care': { pt: 'Óptica', es: 'Óptica' },
-  'health.therapy': { pt: 'Terapia', es: 'Terapia' },
-  'health.exams': { pt: 'Exames', es: 'Exámenes' },
-  'health.gym': { pt: 'Academia', es: 'Gimnasio' },
-  'health.supplements': { pt: 'Suplementos', es: 'Suplementos' },
+  'health.health': { pt: 'Saúde', es: 'Salud', it: 'Salute' },
+  'health.health-insurance': { pt: 'Plano de Saúde', es: 'Seguro Médico', it: 'Assicurazione Sanitaria' },
+  'health.pharmacy': { pt: 'Farmácia', es: 'Farmacia', it: 'Farmacia' },
+  'health.dentist': { pt: 'Dentista', es: 'Dentista', it: 'Dentista' },
+  'health.vision-care': { pt: 'Óptica', es: 'Óptica', it: 'Ottica' },
+  'health.therapy': { pt: 'Terapia', es: 'Terapia', it: 'Terapia' },
+  'health.exams': { pt: 'Exames', es: 'Exámenes', it: 'Esami' },
+  'health.gym': { pt: 'Academia', es: 'Gimnasio', it: 'Palestra' },
+  'health.supplements': { pt: 'Suplementos', es: 'Suplementos', it: 'Integratori' },
 
-  'shopping.clothing': { pt: 'Roupas', es: 'Ropa' },
-  'shopping.shoes': { pt: 'Calçados', es: 'Calzado' },
-  'shopping.shopping': { pt: 'Compras', es: 'Compras' },
-  'shopping.accessories': { pt: 'Acessórios', es: 'Accesorios' },
-  'shopping.electronics': { pt: 'Eletrônicos', es: 'Electrónica' },
+  'shopping.clothing': { pt: 'Roupas', es: 'Ropa', it: 'Abbigliamento' },
+  'shopping.shoes': { pt: 'Calçados', es: 'Calzado', it: 'Scarpe' },
+  'shopping.shopping': { pt: 'Compras', es: 'Compras', it: 'Shopping' },
+  'shopping.accessories': { pt: 'Acessórios', es: 'Accesorios', it: 'Accessori' },
+  'shopping.electronics': { pt: 'Eletrônicos', es: 'Electrónica', it: 'Elettronica' },
 
-  'entertainment.leisure': { pt: 'Lazer', es: 'Ocio' },
-  'entertainment.movies': { pt: 'Cinema', es: 'Cine' },
-  'entertainment.concerts': { pt: 'Shows', es: 'Conciertos' },
-  'entertainment.events': { pt: 'Eventos', es: 'Eventos' },
-  'entertainment.games': { pt: 'Jogos', es: 'Juegos' },
-  'entertainment.hobbies': { pt: 'Hobbies', es: 'Pasatiempos' },
+  'entertainment.leisure': { pt: 'Lazer', es: 'Ocio', it: 'Svago' },
+  'entertainment.movies': { pt: 'Cinema', es: 'Cine', it: 'Cinema' },
+  'entertainment.concerts': { pt: 'Shows', es: 'Conciertos', it: 'Concerti' },
+  'entertainment.events': { pt: 'Eventos', es: 'Eventos', it: 'Eventi' },
+  'entertainment.games': { pt: 'Jogos', es: 'Juegos', it: 'Giochi' },
+  'entertainment.hobbies': { pt: 'Hobbies', es: 'Pasatiempos', it: 'Hobby' },
 
   // Brand streamings fall back to `name`; only the generic ones are translated.
-  'subscriptions.cloud-storage': { pt: 'Armazenamento em Nuvem', es: 'Almacenamiento en la Nube' },
-  'subscriptions.ai-services': { pt: 'Serviços de IA', es: 'Servicios de IA' },
-  'subscriptions.news': { pt: 'Notícias / Revistas', es: 'Noticias / Revistas' },
-  'subscriptions.mobile-plan': { pt: 'Plano de Celular', es: 'Plan de Móvil' },
+  'subscriptions.cloud-storage': { pt: 'Armazenamento em Nuvem', es: 'Almacenamiento en la Nube', it: 'Archiviazione Cloud' },
+  'subscriptions.ai-services': { pt: 'Serviços de IA', es: 'Servicios de IA', it: 'Servizi IA' },
+  'subscriptions.news': { pt: 'Notícias / Revistas', es: 'Noticias / Revistas', it: 'Notizie / Riviste' },
+  'subscriptions.mobile-plan': { pt: 'Plano de Celular', es: 'Plan de Móvil', it: 'Piano Telefonico' },
 
-  'education.education': { pt: 'Educação', es: 'Educación' },
-  'education.tuition': { pt: 'Mensalidade', es: 'Matrícula' },
-  'education.courses': { pt: 'Cursos', es: 'Cursos' },
-  'education.language': { pt: 'Idiomas', es: 'Idiomas' },
-  'education.books': { pt: 'Livros', es: 'Libros' },
-  'education.school-supplies': { pt: 'Material Escolar', es: 'Material Escolar' },
+  'education.education': { pt: 'Educação', es: 'Educación', it: 'Istruzione' },
+  'education.tuition': { pt: 'Mensalidade', es: 'Matrícula', it: 'Retta Scolastica' },
+  'education.courses': { pt: 'Cursos', es: 'Cursos', it: 'Corsi' },
+  'education.language': { pt: 'Idiomas', es: 'Idiomas', it: 'Lingue' },
+  'education.books': { pt: 'Livros', es: 'Libros', it: 'Libri' },
+  'education.school-supplies': { pt: 'Material Escolar', es: 'Material Escolar', it: 'Materiale Scolastico' },
 
-  'work.equipment': { pt: 'Equipamentos', es: 'Equipos' },
-  'work.office-supplies': { pt: 'Material de Escritório', es: 'Material de Oficina' },
-  'work.software': { pt: 'Software', es: 'Software' },
-  'work.coworking': { pt: 'Coworking', es: 'Coworking' },
-  'work.services': { pt: 'Serviços / Freelancers', es: 'Servicios / Freelancers' },
-  'work.ads': { pt: 'Anúncios / Marketing', es: 'Anuncios / Marketing' },
+  'work.equipment': { pt: 'Equipamentos', es: 'Equipos', it: 'Attrezzatura' },
+  'work.office-supplies': { pt: 'Material de Escritório', es: 'Material de Oficina', it: 'Materiale da Ufficio' },
+  'work.software': { pt: 'Software', es: 'Software', it: 'Software' },
+  'work.coworking': { pt: 'Coworking', es: 'Coworking', it: 'Coworking' },
+  'work.services': { pt: 'Serviços / Freelancers', es: 'Servicios / Freelancers', it: 'Servizi / Freelance' },
+  'work.ads': { pt: 'Anúncios / Marketing', es: 'Anuncios / Marketing', it: 'Pubblicità / Marketing' },
 
-  'travel.flights': { pt: 'Passagens', es: 'Vuelos' },
-  'travel.hotels': { pt: 'Hotéis', es: 'Hoteles' },
-  'travel.local-transport': { pt: 'Transporte Local', es: 'Transporte Local' },
-  'travel.meals': { pt: 'Refeições', es: 'Comidas' },
-  'travel.tours': { pt: 'Passeios', es: 'Tours' },
-  'travel.travel-insurance': { pt: 'Seguro Viagem', es: 'Seguro de Viaje' },
+  'travel.flights': { pt: 'Passagens', es: 'Vuelos', it: 'Voli' },
+  'travel.hotels': { pt: 'Hotéis', es: 'Hoteles', it: 'Hotel' },
+  'travel.local-transport': { pt: 'Transporte Local', es: 'Transporte Local', it: 'Trasporto Locale' },
+  'travel.meals': { pt: 'Refeições', es: 'Comidas', it: 'Pasti' },
+  'travel.tours': { pt: 'Passeios', es: 'Tours', it: 'Tour' },
+  'travel.travel-insurance': { pt: 'Seguro Viagem', es: 'Seguro de Viaje', it: 'Assicurazione Viaggio' },
 
-  'pets.pet-food': { pt: 'Ração', es: 'Comida de Mascotas' },
-  'pets.vet': { pt: 'Veterinário', es: 'Veterinario' },
-  'pets.pet-meds': { pt: 'Medicamentos Pet', es: 'Medicamentos' },
-  'pets.grooming': { pt: 'Banho e Tosa', es: 'Peluquería Canina' },
-  'pets.pet-supplies': { pt: 'Acessórios Pet', es: 'Accesorios de Mascotas' },
+  'pets.pet-food': { pt: 'Ração', es: 'Comida de Mascotas', it: 'Cibo per Animali' },
+  'pets.vet': { pt: 'Veterinário', es: 'Veterinario', it: 'Veterinario' },
+  'pets.pet-meds': { pt: 'Medicamentos Pet', es: 'Medicamentos', it: 'Farmaci per Animali' },
+  'pets.grooming': { pt: 'Banho e Tosa', es: 'Peluquería Canina', it: 'Toelettatura' },
+  'pets.pet-supplies': { pt: 'Acessórios Pet', es: 'Accesorios de Mascotas', it: 'Accessori per Animali' },
 
-  'finance.credit-card': { pt: 'Cartão de Crédito', es: 'Tarjeta de Crédito' },
-  'finance.investments': { pt: 'Investimentos', es: 'Inversiones' },
-  'finance.loans': { pt: 'Empréstimos', es: 'Préstamos' },
-  'finance.insurance': { pt: 'Seguros', es: 'Seguros' },
-  'finance.taxes': { pt: 'Impostos', es: 'Impuestos' },
-  'finance.bank-fees': { pt: 'Tarifas Bancárias', es: 'Comisiones Bancarias' },
+  'finance.credit-card': { pt: 'Cartão de Crédito', es: 'Tarjeta de Crédito', it: 'Carta di Credito' },
+  'finance.investments': { pt: 'Investimentos', es: 'Inversiones', it: 'Investimenti' },
+  'finance.loans': { pt: 'Empréstimos', es: 'Préstamos', it: 'Prestiti' },
+  'finance.insurance': { pt: 'Seguros', es: 'Seguros', it: 'Assicurazioni' },
+  'finance.taxes': { pt: 'Impostos', es: 'Impuestos', it: 'Tasse' },
+  'finance.bank-fees': { pt: 'Tarifas Bancárias', es: 'Comisiones Bancarias', it: 'Commissioni Bancarie' },
 
-  'family.gifts': { pt: 'Presentes', es: 'Regalos' },
-  'family.other': { pt: 'Outros', es: 'Otros' }
+  'family.gifts': { pt: 'Presentes', es: 'Regalos', it: 'Regali' },
+  'family.other': { pt: 'Outros', es: 'Otros', it: 'Altro' }
 };
 
 // Localized display name for a category, falling back to the taxonomy `name`.
@@ -434,8 +434,8 @@ export const subcategoryName = (
 // -----------------------------------------------------------------------------
 // Guards the invariants that are easy to break when editing the taxonomy by
 // hand: duplicate keys, categories left without subcategories, translation
-// entries missing pt/es, or table keys that point to something that no longer
-// exists. Returns a list of human-readable problems (empty means healthy).
+// entries missing pt/es/it, or table keys that point to something that no
+// longer exists. Returns a list of human-readable problems (empty means healthy).
 // Run automatically in development from main.tsx.
 export const validateTaxonomy = (): string[] => {
   const problems: string[] = [];
@@ -448,7 +448,7 @@ export const validateTaxonomy = (): string[] => {
     }
     categoryKeys.add(category.key);
 
-    for (const lang of ['pt', 'es'] as const) {
+    for (const lang of ['pt', 'es', 'it'] as const) {
       if (!categoryNames[category.key]?.[lang]) {
         problems.push(`Category "${category.key}" is missing its ${lang} label`);
       }
@@ -468,14 +468,14 @@ export const validateTaxonomy = (): string[] => {
     }
   }
 
-  // A translation entry, when present, must carry both pt and es (partial rows
+  // A translation entry, when present, must carry pt, es and it (partial rows
   // are almost always an editing slip). Keys must also point to a real pair.
   for (const [pair, translations] of Object.entries(subcategoryNames)) {
     if (!validPairs.has(pair)) {
       problems.push(`Translation for unknown subcategory: "${pair}"`);
       continue;
     }
-    for (const lang of ['pt', 'es'] as const) {
+    for (const lang of ['pt', 'es', 'it'] as const) {
       if (!translations[lang]) {
         problems.push(`Subcategory "${pair}" is missing its ${lang} label`);
       }

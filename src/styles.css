@@ -1364,6 +1364,18 @@ select option {
   padding: 40px 0;
 }
 
+/* Nas telas de autenticação o cartão fica numa coluna estreita e centralizada,
+   então o alinhamento padrão do seletor (à direita da própria coluna) ainda
+   cai perto do centro da tela. Fixamos no canto da viewport de verdade, como
+   já é feito com o botão do menu de meses. */
+.auth-shell .language-selector {
+  position: fixed;
+  z-index: 60;
+  top: 24px;
+  right: 24px;
+  margin: 0;
+}
+
 .auth-brand {
   display: grid;
   justify-items: center;
@@ -1607,6 +1619,11 @@ select option {
   .month-menu-button {
     top: 14px;
     left: 14px;
+  }
+
+  .auth-shell .language-selector {
+    top: 14px;
+    right: 14px;
   }
 
   .app-shell {

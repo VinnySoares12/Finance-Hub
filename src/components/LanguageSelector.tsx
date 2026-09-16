@@ -4,7 +4,8 @@ import type { Language } from '../i18n';
 const languages: Array<{ code: Language; label: string }> = [
   { code: 'pt', label: 'Português' },
   { code: 'en', label: 'English' },
-  { code: 'es', label: 'Español' }
+  { code: 'es', label: 'Español' },
+  { code: 'it', label: 'Italiano' }
 ];
 
 function Flag({ language }: { language: Language }) {
@@ -38,11 +39,21 @@ function Flag({ language }: { language: Language }) {
     );
   }
 
+  if (language === 'es') {
+    return (
+      <svg viewBox="0 0 28 20" aria-hidden="true">
+        <rect width="28" height="20" fill="#AA151B" />
+        <rect y="5" width="28" height="10" fill="#F1BF00" />
+        <rect x="7" y="8" width="2.5" height="5" rx=".5" fill="#AA151B" />
+      </svg>
+    );
+  }
+
   return (
     <svg viewBox="0 0 28 20" aria-hidden="true">
-      <rect width="28" height="20" fill="#AA151B" />
-      <rect y="5" width="28" height="10" fill="#F1BF00" />
-      <rect x="7" y="8" width="2.5" height="5" rx=".5" fill="#AA151B" />
+      <rect width="28" height="20" fill="#fff" />
+      <rect width="9.34" height="20" fill="#009246" />
+      <rect x="18.66" width="9.34" height="20" fill="#CE2B37" />
     </svg>
   );
 }
